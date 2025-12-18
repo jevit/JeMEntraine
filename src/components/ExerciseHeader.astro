@@ -1,89 +1,190 @@
 ---
+/**
+ * ExerciseHeader - En-tête d'exercice
+ *
+ * Bonnes pratiques d'apprentissage :
+ * - Titre clair et engageant
+ * - Badges de niveau/domaine pour orientation
+ * - Consigne mise en valeur et positive
+ * - Indicateurs visuels (emoji, couleurs)
+ */
 import type { Exercise } from '../types/exercise';
-import { domainEmojis, domainLabels, levelEmojis } from '../utils/helpers';
+import { domainEmojis, domainLabels, levelEmojis, estimateTime } from '../utils/helpers';
 
 interface Props {
   exercise: Exercise;
 }
 
 const { exercise } = Astro.props;
+const timeEstimate = estimateTime(exercise.items.length, exercise.level);
+
+// Emoji saisonnier pour le thème
+const themeEmojis: Record<string, string> = {
+  'Noël': '🎄',
+  'Nouvel An': '🎆',
+  'Halloween': '🎃',
+  'Pâques': '🐰',
+  'Printemps': '🌸',
+  'Été': '☀️',
+  'Automne': '🍂',
+  'Hiver': '❄️',
+};
+const themeEmoji = exercise.theme ? (themeEmojis[exercise.theme] || '📚') : null;
 ---
 
-<div class="exercise-header">
-  <span class="exercise-header__emoji">{domainEmojis[exercise.domain]}</span>
-  
+<header class="exercise-header" role="banner">
+  {/* Emoji du domaine */}
+  <div class="exercise-header__emoji" aria-hidden="true">
+    {domainEmojis[exercise.domain]}
+  </div>
+
+  {/* Titre principal */}
   <h1 class="exercise-header__title">{exercise.h1}</h1>
-  
-  <div class="exercise-header__badges">
-    <span class={`badge badge--${exercise.level.toLowerCase()}`}>
+
+  {/* Badges d'information */}
+  <div class="exercise-header__badges" role="list" aria-label="Informations sur l'exercice">
+    <span class={`badge badge--${exercise.level.toLowerCase()}`} role="listitem">
       {levelEmojis[exercise.level]} {exercise.level}
     </span>
-    <span class={`badge badge--${exercise.domain}`}>
+    <span class={`badge badge--${exercise.domain}`} role="listitem">
       {domainLabels[exercise.domain]}
     </span>
     {exercise.theme && (
-      <span class="badge badge--theme">
-        🎄 {exercise.theme}
+      <span class="badge badge--theme" role="listitem">
+        {themeEmoji} {exercise.theme}
       </span>
     )}
   </div>
-  
-  <div class="exercise-header__instruction">
-    <span class="instruction-icon">💡</span>
-    <span>{exercise.instruction}</span>
+
+  {/* Métadonnées */}
+  <div class="exercise-header__meta">
+    <span class="meta-item">
+      <span aria-hidden="true">📝</span>
+      <span>{exercise.items.length} question{exercise.items.length > 1 ? 's' : ''}</span>
+    </span>
+    <span class="meta-item">
+      <span aria-hidden="true">⏱️</span>
+      <span>~{timeEstimate} min</span>
+    </span>
   </div>
-</div>
+
+  {/* Consigne - mise en valeur */}
+  <div class="exercise-header__instruction" role="note" aria-label="Consigne de l'exercice">
+    <span class="instruction-icon" aria-hidden="true">📖</span>
+    <p class="instruction-text">{exercise.instruction}</p>
+  </div>
+</header>
 
 <style>
   .exercise-header {
     background: var(--color-bg-card);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
     box-shadow: var(--shadow-md);
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-8);
     text-align: center;
+    border: 2px solid transparent;
+    animation: slideUp var(--transition-slow) ease-out;
   }
-  
+
   .exercise-header__emoji {
-    display: block;
-    font-size: 4rem;
-    margin-bottom: 1rem;
+    font-size: 4.5rem;
+    margin-bottom: var(--space-4);
+    line-height: 1;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
   }
-  
+
   .exercise-header__title {
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
+    font-weight: 700;
     color: var(--color-primary-dark);
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
+    line-height: 1.3;
   }
-  
+
   .exercise-header__badges {
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
     flex-wrap: wrap;
   }
-  
+
   .badge--theme {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--color-info-light);
+    color: var(--color-info);
+    border-color: var(--color-info-border);
   }
-  
-  .exercise-header__instruction {
+
+  .exercise-header__meta {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding: 1.25rem 1.5rem;
-    background: linear-gradient(135deg, #fef3c7, #fce7f3);
-    border-radius: var(--radius-md);
-    font-size: 1.1rem;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
     font-weight: 500;
   }
-  
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .exercise-header__instruction {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-6);
+    background: linear-gradient(135deg, #FEF3C7, #FDF2F8);
+    border-radius: var(--radius-lg);
+    border: 2px solid #FDE68A;
+  }
+
   .instruction-icon {
-    font-size: 1.5rem;
+    font-size: var(--text-2xl);
     flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .instruction-text {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.6;
+    margin: 0;
+    text-align: left;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .exercise-header {
+      padding: var(--space-6);
+      border-radius: var(--radius-lg);
+    }
+
+    .exercise-header__emoji {
+      font-size: 3.5rem;
+    }
+
+    .exercise-header__instruction {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: var(--space-4);
+    }
+
+    .instruction-text {
+      text-align: center;
+      font-size: var(--text-base);
+    }
+
+    .exercise-header__meta {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
   }
 </style>
