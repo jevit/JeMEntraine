@@ -16,14 +16,10 @@ import ce2Ex from '../../../content/exercises/2025/01/ce2-multiplications.json';
 const exercises: Exercise[] = [cpEx, ce1Ex, ce2Ex] as Exercise[];
 
 export function getStaticPaths() {
-  // En production, charger dynamiquement tous les exercices
-  const cpEx = require('../../../content/exercises/2025/01/cp-additions-10.json');
-  const ce1Ex = require('../../../content/exercises/2025/01/ce1-sons-on-an.json');
-  const ce2Ex = require('../../../content/exercises/2025/01/ce2-multiplications.json');
-  
-  const exercises = [cpEx, ce1Ex, ce2Ex];
-  
-  return exercises.map((exercise) => ({
+  // Utiliser les exercices déjà importés en ESM
+  const allExercises = [cpEx, ce1Ex, ce2Ex];
+
+  return allExercises.map((exercise) => ({
     params: { slug: exercise.slug },
     props: { exercise }
   }));
