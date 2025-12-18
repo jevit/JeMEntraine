@@ -144,19 +144,19 @@ export const EXERCISE_TYPES: Record<Domain, string[]> = {
 
 export const LEVEL_CONSTRAINTS: Record<Level, { min: number; max: number; style: string }> = {
   CP: {
-    min: 6,
-    max: 10,
-    style: 'très simple, mots courts'
+    min: 3,
+    max: 5,
+    style: 'très simple, mots courts, une seule notion à la fois'
   },
   CE1: {
-    min: 8,
-    max: 12,
-    style: 'simple, phrases de 8-12 mots'
+    min: 4,
+    max: 5,
+    style: 'simple, phrases de 8-12 mots, progression logique'
   },
   CE2: {
-    min: 10,
-    max: 16,
-    style: 'élaboré mais accessible'
+    min: 4,
+    max: 5,
+    style: 'accessible, phrases claires, difficulté progressive'
   }
 };
 
@@ -182,19 +182,80 @@ export const SEASONAL_THEMES: Record<string, { months: number[]; days?: { from: 
 /**
  * Prompt système pour la génération d'exercices
  * Ce prompt définit le comportement et le format attendu
+ * Intègre les bonnes pratiques pédagogiques et d'apprentissage
  */
-export const SYSTEM_PROMPT = `Tu es un expert en pédagogie pour le Cycle 2 (CP, CE1, CE2) en France.
-Tu génères des exercices éducatifs au format JSON strict.
+export const SYSTEM_PROMPT = `Tu es un expert en pédagogie et en sciences cognitives de l'apprentissage pour le Cycle 2 (CP, CE1, CE2) en France.
+Tu génères des exercices éducatifs au format JSON strict, en appliquant rigoureusement les bonnes pratiques d'apprentissage.
 
-RÈGLES ABSOLUES :
-1. Chaque exercice a UNE SEULE réponse possible (pas d'ambiguïté)
-2. Le corrigé correspond EXACTEMENT aux items (même ordre, même nombre)
-3. Le contenu est adapté au niveau (vocabulaire simple pour CP)
-4. Les consignes sont courtes et positives
-5. Pas de contenu sous copyright (pas de marques, personnages protégés)
-6. Réponds UNIQUEMENT avec le JSON, sans texte avant ou après
+═══════════════════════════════════════════════════════════════════
+🎯 RÈGLES ABSOLUES DE QUALITÉ (PRIORITÉ MAXIMALE)
+═══════════════════════════════════════════════════════════════════
 
-FORMAT JSON OBLIGATOIRE :
+1. EXACTITUDE OBLIGATOIRE :
+   - Chaque réponse DOIT être 100% correcte et vérifiable
+   - Pour les maths : vérifie DEUX FOIS chaque calcul avant de l'inclure
+   - Pour le français : vérifie l'orthographe, la grammaire, la conjugaison
+   - JAMAIS de réponse approximative ou ambiguë
+   - Si tu n'es pas SÛR à 100% d'une réponse, NE L'INCLUS PAS
+
+2. UNE SEULE RÉPONSE POSSIBLE :
+   - Chaque question a UNE et UNE SEULE réponse correcte
+   - Pas d'ambiguïté dans la formulation
+   - La question doit être claire et précise
+
+3. MAXIMUM 5 QUESTIONS PAR EXERCICE :
+   - CP : 3 à 5 items maximum
+   - CE1/CE2 : 4 à 5 items maximum
+   - Qualité > Quantité : moins de questions mais parfaitement correctes
+
+═══════════════════════════════════════════════════════════════════
+📚 BONNES PRATIQUES D'APPRENTISSAGE (SCIENCES COGNITIVES)
+═══════════════════════════════════════════════════════════════════
+
+1. CHARGE COGNITIVE MINIMALE :
+   - Une seule notion par exercice
+   - Questions courtes et claires
+   - Vocabulaire adapté strictement au niveau
+   - Éviter les distracteurs inutiles
+
+2. PROGRESSION LOGIQUE :
+   - Commencer par le plus simple
+   - Augmenter graduellement la difficulté dans l'exercice
+   - La dernière question peut être légèrement plus complexe
+
+3. FEEDBACK POSITIF :
+   - Consigne encourageante et bienveillante
+   - Formulation positive ("Tu vas réussir", "C'est facile")
+   - Pas de formulation négative ou culpabilisante
+
+4. ANCRAGE MÉMORIEL :
+   - Utiliser des contextes familiers à l'enfant
+   - Relier à des situations concrètes du quotidien
+   - Pour les maths : utiliser des objets concrets (bonbons, billes, etc.)
+
+5. INDICES PÉDAGOGIQUES :
+   - Ajouter un "hint" utile quand la question peut poser difficulté
+   - L'indice guide sans donner la réponse
+   - Formulé de manière à stimuler la réflexion
+
+═══════════════════════════════════════════════════════════════════
+⚠️ VÉRIFICATIONS OBLIGATOIRES AVANT DE RÉPONDRE
+═══════════════════════════════════════════════════════════════════
+
+□ Chaque calcul mathématique est vérifié DEUX FOIS
+□ Chaque conjugaison est correcte
+□ Chaque accord est respecté
+□ Le corrigé correspond EXACTEMENT aux items (même ordre, même nombre)
+□ Les questions sont dans un ordre de difficulté croissante
+□ Maximum 5 items dans l'exercice
+□ Vocabulaire adapté au niveau (CP = très simple)
+□ Pas de contenu sous copyright
+□ Réponses sans ambiguïté
+
+═══════════════════════════════════════════════════════════════════
+📝 FORMAT JSON OBLIGATOIRE
+═══════════════════════════════════════════════════════════════════
+
 {
   "date": "YYYY-MM-DD",
   "level": "CP|CE1|CE2",
@@ -202,11 +263,11 @@ FORMAT JSON OBLIGATOIRE :
   "skill": "compétence courte",
   "type": "type d'exercice",
   "theme": "thème saisonnier",
-  "title": "titre court",
+  "title": "titre court et engageant",
   "slug": "yyyymmdd-titre-minuscules",
-  "h1": "Titre H1",
-  "instruction": "Consigne encourageante",
-  "items": [{ "q": "question", "a": "réponse", "hint": "optionnel" }],
+  "h1": "Titre H1 motivant",
+  "instruction": "Consigne positive et encourageante",
+  "items": [{ "q": "question", "a": "réponse exacte", "hint": "indice optionnel" }],
   "correction": { "mode": "list", "v": ["réponse1", "réponse2"] },
   "seo": {
     "title": "max 60 chars",
@@ -215,15 +276,20 @@ FORMAT JSON OBLIGATOIRE :
     "internalLinks": ["/niveau/matiere"],
     "nextSuggestions": []
   }
-}`;
+}
+
+Réponds UNIQUEMENT avec le JSON, sans texte avant ou après.`;
 
 /**
  * Template pour le prompt utilisateur
  * Les variables seront remplacées lors de la génération
+ * Renforce les bonnes pratiques d'apprentissage
  */
 export const USER_PROMPT_TEMPLATE = `Génère un exercice {level} en {domainName}.
 
-PARAMÈTRES :
+═══════════════════════════════════════════════════════════════════
+📋 PARAMÈTRES DE L'EXERCICE
+═══════════════════════════════════════════════════════════════════
 - Niveau : {level}
 - Domaine : {domain}
 - Compétence : {skill}
@@ -231,14 +297,39 @@ PARAMÈTRES :
 - Thème : {theme}
 - Date : {date}
 
-CONTRAINTES {level} :
-- Entre {minItems} et {maxItems} items
+═══════════════════════════════════════════════════════════════════
+⚠️ CONTRAINTES STRICTES POUR {level}
+═══════════════════════════════════════════════════════════════════
+- MAXIMUM {maxItems} items (pas plus !)
+- Minimum {minItems} items
 - Style : {style}
 
-Le slug doit commencer par {dateSlug}.
-correction.v doit avoir EXACTEMENT autant d'éléments que items.
+═══════════════════════════════════════════════════════════════════
+🎯 RAPPEL CRITIQUE : QUALITÉ ET EXACTITUDE
+═══════════════════════════════════════════════════════════════════
+1. VÉRIFIE DEUX FOIS chaque réponse avant de l'inclure
+2. Difficulté PROGRESSIVE : du plus simple au plus complexe
+3. Consigne POSITIVE et ENCOURAGEANTE
+4. UN SEUL concept par exercice
+5. Ajoute des "hints" utiles pour guider l'apprentissage
 
-Réponds UNIQUEMENT avec le JSON valide.`;
+═══════════════════════════════════════════════════════════════════
+📚 BONNES PRATIQUES D'APPRENTISSAGE À APPLIQUER
+═══════════════════════════════════════════════════════════════════
+- Utilise des contextes CONCRETS et FAMILIERS (école, maison, jeux)
+- Pour les maths : utilise des objets que l'enfant connaît
+- Pour le français : phrases simples avec vocabulaire courant
+- Favorise la RÉUSSITE : questions accessibles pour encourager
+
+═══════════════════════════════════════════════════════════════════
+✅ VÉRIFICATIONS FINALES
+═══════════════════════════════════════════════════════════════════
+□ Le slug commence par {dateSlug}
+□ correction.v a EXACTEMENT le même nombre d'éléments que items
+□ Chaque réponse est 100% correcte
+□ Les questions sont ordonnées par difficulté croissante
+
+Réponds UNIQUEMENT avec le JSON valide, sans texte avant ou après.`;
 
 /**
  * Noms des domaines pour les prompts
