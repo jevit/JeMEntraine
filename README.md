@@ -61,6 +61,34 @@ SITE_URL=https://jementraine.fr              # URL de production
 EXERCISES_PER_DAY=3                        # Nombre d'exercices/jour
 ```
 
+### ⚠️ Dépannage
+
+**Erreur : `Cannot find package 'dotenv'`**
+
+Si vous obtenez cette erreur en exécutant `npm run generate:ai`, cela signifie que les dépendances ne sont pas installées.
+
+Solution :
+```bash
+npm install
+```
+
+**Erreur : `OPENAI_API_KEY non définie`**
+
+Le fichier `.env` n'existe pas ou ne contient pas votre clé API.
+
+Solution :
+```bash
+# Créer le fichier .env depuis l'exemple
+cp .env.example .env
+
+# Éditer .env et remplacer sk-xxxxxxxxxxxxx par votre vraie clé API OpenAI
+```
+
+**Comment obtenir une clé API OpenAI ?**
+1. Créez un compte sur [platform.openai.com](https://platform.openai.com)
+2. Allez dans **API Keys**
+3. Créez une nouvelle clé et copiez-la dans votre `.env`
+
 ---
 
 ## 📁 Structure du projet
@@ -107,7 +135,7 @@ jementraine/
 
 ---
 
-## 🤖 Génération automatique avec Claude
+## 🤖 Génération automatique avec OpenAI (GPT-4o)
 
 ### Architecture du système IA
 
@@ -158,7 +186,7 @@ jementraine/
 npm run generate:daily          # 1 exercice/niveau = 3 exercices
 npm run generate:batch 30       # 30 exercices
 
-# Génération IA (Claude)
+# Génération IA (OpenAI GPT-4o)
 npm run generate:ai             # 3 exercices IA du jour
 npm run generate:ai -- --count 10 --level CE1 --domain math
 npm run generate:ai -- --week   # Génère une semaine complète
@@ -171,7 +199,7 @@ npm run validate                # Vérifie tous les exercices
 
 ## 📝 Script de génération IA
 
-Le script `scripts/generate-ai.ts` appelle l'API Claude pour générer des exercices.
+Le script `scripts/generate-ai.ts` appelle l'API OpenAI (GPT-4o) pour générer des exercices.
 
 ### Fonctionnement
 
@@ -191,7 +219,7 @@ Le script `scripts/generate-ai.ts` appelle l'API Claude pour générer des exerc
 | EMC | 10% | Vivre ensemble, citoyenneté |
 | Anglais | 5% | Vocabulaire, expressions |
 
-### Exemple de prompt envoyé à Claude
+### Exemple de prompt envoyé à GPT-4o
 
 ```
 Tu es un expert en pédagogie pour le Cycle 2 (CP, CE1, CE2).
@@ -240,7 +268,7 @@ jobs:
       
       - name: Generate with AI
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run generate:ai -- --count 3
         
       - name: Validate
