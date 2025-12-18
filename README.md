@@ -1,4 +1,4 @@
-# 📚 ExoCycle2 - Site Éducatif Cycle 2
+# 📚 JeMEntraine - Site Éducatif Cycle 2
 
 Site Astro statique avec génération automatique d'exercices éducatifs via IA pour le Cycle 2 (CP, CE1, CE2).
 
@@ -39,8 +39,8 @@ Site Astro statique avec génération automatique d'exercices éducatifs via IA 
 
 ```bash
 # Cloner et installer
-git clone https://github.com/your-repo/exocycle2.git
-cd exocycle2
+git clone https://github.com/your-repo/jementraine.git
+cd jementraine
 npm install
 
 # Configurer l'API OpenAI (pour génération IA)
@@ -57,7 +57,7 @@ npm run dev
 # .env
 OPENAI_API_KEY=sk-xxxxxxxxxxxxx           # Clé API OpenAI (obligatoire)
 OPENAI_MODEL=gpt-4o                        # Modèle (défaut: gpt-4o)
-SITE_URL=https://exocycle2.fr              # URL de production
+SITE_URL=https://jementraine.fr              # URL de production
 EXERCISES_PER_DAY=3                        # Nombre d'exercices/jour
 ```
 
@@ -66,7 +66,7 @@ EXERCISES_PER_DAY=3                        # Nombre d'exercices/jour
 ## 📁 Structure du projet
 
 ```
-exocycle2/
+jementraine/
 ├── src/
 │   ├── components/           # Composants Astro
 │   │   ├── ExerciseCard.astro
@@ -262,7 +262,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: exocycle2
+          projectName: jementraine
           directory: dist
 ```
 

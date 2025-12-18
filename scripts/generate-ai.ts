@@ -2,26 +2,42 @@
 /**
  * Générateur d'exercices via OpenAI API (GPT-4)
  * Inspiré du workflow Melicolori : génération automatique + SEO
- * 
+ *
  * Usage:
  *   npm run generate:ai
  *   npm run generate:ai -- --count 10
  *   npm run generate:ai -- --count 5 --level CE1 --domain math
- * 
+ *
  * Variables d'environnement:
  *   OPENAI_API_KEY    - Clé API OpenAI (obligatoire)
  *   OPENAI_MODEL      - Modèle à utiliser (défaut: gpt-4o)
+ *
+ * Configuration:
+ *   Les prompts, compétences et paramètres SEO sont dans /config/
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Import des configurations
+import {
+  AI_CONFIG,
+  DOMAIN_WEIGHTS,
+  SKILLS,
+  EXERCISE_TYPES,
+  LEVEL_CONSTRAINTS,
+  SEASONAL_THEMES,
+  SYSTEM_PROMPT,
+  USER_PROMPT_TEMPLATE,
+  DOMAIN_NAMES,
+  SITE_CONFIG,
+  type Level,
+  type Domain
+} from '../config';
+
 // ============================================================================
 // TYPES
 // ============================================================================
-
-type Level = 'CP' | 'CE1' | 'CE2';
-type Domain = 'fr' | 'math' | 'qlm' | 'emc' | 'lv';
 
 interface ExerciseItem {
   q: string;
@@ -70,181 +86,29 @@ interface ValidationError {
 // ============================================================================
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
-
-// Distribution pondérée des domaines
-const DOMAIN_WEIGHTS: Record<Domain, number> = {
-  fr: 40,
-  math: 30,
-  qlm: 15,
-  emc: 10,
-  lv: 5
-};
-
-// Compétences par domaine et niveau
-const SKILLS: Record<Domain, Record<Level, string[]>> = {
-  fr: {
-    CP: [
-      'Reconnaître les lettres',
-      'Lire des syllabes simples',
-      'Compléter avec le/la/les',
-      'Identifier les sons voyelles',
-      'Reconnaître le son d\'attaque'
-    ],
-    CE1: [
-      'Distinguer les sons on/an',
-      'Conjuguer être et avoir au présent',
-      'Identifier le verbe',
-      'Accorder en genre et nombre',
-      'Identifier nom/verbe/adjectif'
-    ],
-    CE2: [
-      'Conjuguer au présent/passé/futur',
-      'Identifier COD et COI',
-      'Utiliser et/est, a/à',
-      'Accorder le participe passé',
-      'Enrichir une phrase'
-    ]
-  },
-  math: {
-    CP: [
-      'Additionner jusqu\'à 10',
-      'Soustraire jusqu\'à 10',
-      'Compter jusqu\'à 100',
-      'Comparer des nombres',
-      'Résoudre un problème simple'
-    ],
-    CE1: [
-      'Additionner jusqu\'à 100',
-      'Soustraire avec retenue',
-      'Tables de 2 et 5',
-      'Lire l\'heure',
-      'Résoudre un problème'
-    ],
-    CE2: [
-      'Multiplier (tables 2 à 9)',
-      'Diviser par 2 et 5',
-      'Calculer avec 3 chiffres',
-      'Convertir des mesures',
-      'Calculer un périmètre'
-    ]
-  },
-  qlm: {
-    CP: [
-      'Les parties du corps',
-      'Les saisons',
-      'Vivant/non-vivant',
-      'Les jours de la semaine'
-    ],
-    CE1: [
-      'Les états de l\'eau',
-      'Les milieux de vie',
-      'Les besoins des plantes',
-      'Se repérer sur un plan'
-    ],
-    CE2: [
-      'Le cycle de l\'eau',
-      'Le système solaire',
-      'La chaîne alimentaire',
-      'Lire une carte'
-    ]
-  },
-  emc: {
-    CP: ['Règles de politesse', 'Les émotions', 'Règles de vie en classe'],
-    CE1: ['Droits et devoirs', 'Situations de danger', 'Coopérer'],
-    CE2: ['Les élections', 'Les discriminations', 'Débattre']
-  },
-  lv: {
-    CP: ['Couleurs en anglais', 'Compter jusqu\'à 10'],
-    CE1: ['Se présenter', 'Les animaux'],
-    CE2: ['Décrire une personne', 'Poser des questions']
-  }
-};
-
-// Types d'exercices par domaine
-const EXERCISE_TYPES: Record<Domain, string[]> = {
-  fr: ['phrases-a-trous', 'qcm', 'vrai-faux', 'relier'],
-  math: ['calcul-mental', 'probleme', 'qcm', 'relier'],
-  qlm: ['qcm', 'vrai-faux', 'relier'],
-  emc: ['vrai-faux', 'qcm'],
-  lv: ['relier', 'qcm', 'phrases-a-trous']
-};
-
-// Contraintes par niveau
-const LEVEL_CONSTRAINTS: Record<Level, { min: number; max: number; style: string }> = {
-  CP: { min: 6, max: 10, style: 'très simple, mots courts' },
-  CE1: { min: 8, max: 12, style: 'simple, phrases de 8-12 mots' },
-  CE2: { min: 10, max: 16, style: 'élaboré mais accessible' }
-};
+const OPENAI_MODEL = process.env.OPENAI_MODEL || AI_CONFIG.defaultModel;
 
 // ============================================================================
-// PROMPTS OPENAI
+// PROMPTS
 // ============================================================================
-
-const SYSTEM_PROMPT = `Tu es un expert en pédagogie pour le Cycle 2 (CP, CE1, CE2) en France.
-Tu génères des exercices éducatifs au format JSON strict.
-
-RÈGLES ABSOLUES :
-1. Chaque exercice a UNE SEULE réponse possible (pas d'ambiguïté)
-2. Le corrigé correspond EXACTEMENT aux items (même ordre, même nombre)
-3. Le contenu est adapté au niveau (vocabulaire simple pour CP)
-4. Les consignes sont courtes et positives
-5. Pas de contenu sous copyright (pas de marques, personnages protégés)
-6. Réponds UNIQUEMENT avec le JSON, sans texte avant ou après
-
-FORMAT JSON OBLIGATOIRE :
-{
-  "date": "YYYY-MM-DD",
-  "level": "CP|CE1|CE2",
-  "domain": "fr|math|qlm|emc|lv",
-  "skill": "compétence courte",
-  "type": "type d'exercice",
-  "theme": "thème saisonnier",
-  "title": "titre court",
-  "slug": "yyyymmdd-titre-minuscules",
-  "h1": "Titre H1",
-  "instruction": "Consigne encourageante",
-  "items": [{ "q": "question", "a": "réponse", "hint": "optionnel" }],
-  "correction": { "mode": "list", "v": ["réponse1", "réponse2"] },
-  "seo": {
-    "title": "max 60 chars",
-    "description": "max 160 chars",
-    "tags": ["tag1", "tag2"],
-    "internalLinks": ["/niveau/matiere"],
-    "nextSuggestions": []
-  }
-}`;
 
 function buildPrompt(config: GenerationConfig): string {
   const constraint = LEVEL_CONSTRAINTS[config.level];
   const today = new Date().toISOString().split('T')[0];
-  const domainName = {
-    fr: 'français',
-    math: 'mathématiques',
-    qlm: 'questionner le monde',
-    emc: 'EMC',
-    lv: 'anglais'
-  }[config.domain];
+  const domainName = DOMAIN_NAMES[config.domain];
 
-  return `Génère un exercice ${config.level} en ${domainName}.
-
-PARAMÈTRES :
-- Niveau : ${config.level}
-- Domaine : ${config.domain}
-- Compétence : ${config.skill}
-- Type : ${config.type}
-- Thème : ${config.theme}
-- Date : ${today}
-
-CONTRAINTES ${config.level} :
-- Entre ${constraint.min} et ${constraint.max} items
-- Style : ${constraint.style}
-
-Le slug doit commencer par ${today.replace(/-/g, '')}.
-correction.v doit avoir EXACTEMENT autant d'éléments que items.
-
-Réponds UNIQUEMENT avec le JSON valide.`;
+  return USER_PROMPT_TEMPLATE
+    .replace(/{level}/g, config.level)
+    .replace('{domainName}', domainName)
+    .replace('{domain}', config.domain)
+    .replace('{skill}', config.skill)
+    .replace('{type}', config.type)
+    .replace('{theme}', config.theme)
+    .replace('{date}', today)
+    .replace('{minItems}', String(constraint.min))
+    .replace('{maxItems}', String(constraint.max))
+    .replace('{style}', constraint.style)
+    .replace('{dateSlug}', today.replace(/-/g, ''));
 }
 
 // ============================================================================
@@ -261,7 +125,7 @@ function validateExercise(exercise: any): { isValid: boolean; errors: Validation
     }
   }
 
-  if (exercise.level && !['CP', 'CE1', 'CE2'].includes(exercise.level)) {
+  if (exercise.level && !(SITE_CONFIG.levels as readonly string[]).includes(exercise.level)) {
     errors.push({ field: 'level', message: `Niveau invalide: ${exercise.level}` });
   }
 
@@ -316,11 +180,20 @@ function selectDomain(): Domain {
 function getSeasonalTheme(): string {
   const month = new Date().getMonth() + 1;
   const day = new Date().getDate();
-  
-  if (month === 12) return 'Noël';
-  if (month === 1 && day <= 15) return 'Nouvel An';
-  if (month === 10 && day >= 20) return 'Halloween';
-  if (month === 4) return 'Pâques';
+
+  for (const [theme, config] of Object.entries(SEASONAL_THEMES)) {
+    if (config.months.includes(month)) {
+      if (config.days) {
+        if (day >= config.days.from && day <= config.days.to) {
+          return theme;
+        }
+      } else {
+        return theme;
+      }
+    }
+  }
+
+  // Fallback sur la saison
   if (month >= 3 && month <= 5) return 'Printemps';
   if (month >= 6 && month <= 8) return 'Été';
   if (month >= 9 && month <= 11) return 'Automne';
@@ -328,7 +201,7 @@ function getSeasonalTheme(): string {
 }
 
 function selectConfig(forceLevel?: Level, forceDomain?: Domain): GenerationConfig {
-  const level = forceLevel || (['CP', 'CE1', 'CE2'] as Level[])[Math.floor(Math.random() * 3)];
+  const level = forceLevel || (SITE_CONFIG.levels[Math.floor(Math.random() * SITE_CONFIG.levels.length)] as Level);
   const domain = forceDomain || selectDomain();
   
   const skills = SKILLS[domain][level];
@@ -345,7 +218,7 @@ async function callOpenAI(prompt: string): Promise<string> {
     throw new Error('OPENAI_API_KEY non définie');
   }
 
-  const response = await fetch(OPENAI_API_URL, {
+  const response = await fetch(AI_CONFIG.apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -357,8 +230,8 @@ async function callOpenAI(prompt: string): Promise<string> {
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: prompt }
       ],
-      temperature: 0.7,
-      max_tokens: 2000,
+      temperature: AI_CONFIG.temperature,
+      max_tokens: AI_CONFIG.maxTokens,
       response_format: { type: 'json_object' }
     })
   });
@@ -372,12 +245,12 @@ async function callOpenAI(prompt: string): Promise<string> {
   return data.choices?.[0]?.message?.content || '';
 }
 
-async function generateExercise(config: GenerationConfig, maxRetries = 3): Promise<Exercise> {
+async function generateExercise(config: GenerationConfig): Promise<Exercise> {
   const prompt = buildPrompt(config);
-  
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+
+  for (let attempt = 1; attempt <= AI_CONFIG.maxRetries; attempt++) {
     try {
-      console.log(`  🤖 Appel OpenAI ${OPENAI_MODEL} (tentative ${attempt}/${maxRetries})...`);
+      console.log(`  🤖 Appel OpenAI ${OPENAI_MODEL} (tentative ${attempt}/${AI_CONFIG.maxRetries})...`);
       
       const text = await callOpenAI(prompt);
       let jsonText = text.trim();
@@ -391,17 +264,17 @@ async function generateExercise(config: GenerationConfig, maxRetries = 3): Promi
       
       if (!isValid) {
         console.log(`  ⚠️ Validation échouée:`, errors.map(e => e.message).join(', '));
-        if (attempt === maxRetries) {
+        if (attempt === AI_CONFIG.maxRetries) {
           throw new Error(`Validation échouée: ${errors[0].message}`);
         }
         continue;
       }
-      
+
       return exercise;
-      
+
     } catch (error) {
       console.log(`  ❌ Erreur: ${(error as Error).message}`);
-      if (attempt === maxRetries) throw error;
+      if (attempt === AI_CONFIG.maxRetries) throw error;
       await new Promise(r => setTimeout(r, 1000));
     }
   }
@@ -469,10 +342,10 @@ async function main() {
     }
     
     if (i < count - 1) {
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, AI_CONFIG.delayBetweenExercises));
     }
   }
-  
+
   console.log('─'.repeat(50));
   console.log(`📊 Résultat: ${success} réussis, ${failed} échoués`);
   

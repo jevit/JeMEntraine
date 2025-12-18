@@ -16,7 +16,7 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const fullTitle = title === "Accueil" ? "ExoCycle2 - Exercices Cycle 2" : `${title} | ExoCycle2`;
+const fullTitle = title === "Accueil" ? "JeMEntraine - Exercices Cycle 2" : `${title} | JeMEntraine`;
 ---
 
 <!DOCTYPE html>
@@ -57,7 +57,7 @@ const fullTitle = title === "Accueil" ? "ExoCycle2 - Exercices Cycle 2" : `${tit
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "ExoCycle2",
+    "name": "JeMEntraine",
     "url": Astro.site,
     "description": description,
     "potentialAction": {
@@ -76,7 +76,7 @@ const fullTitle = title === "Accueil" ? "ExoCycle2 - Exercices Cycle 2" : `${tit
         <div class="nav__container container">
           <a href="/" class="nav__logo">
             <span class="nav__logo-icon">📚</span>
-            <span class="nav__logo-text">ExoCycle2</span>
+            <span class="nav__logo-text">JeMEntraine</span>
           </a>
           
           <ul class="nav__links">
@@ -99,7 +99,7 @@ const fullTitle = title === "Accueil" ? "ExoCycle2 - Exercices Cycle 2" : `${tit
       <div class="footer__container container">
         <div class="footer__grid">
           <div class="footer__section">
-            <h4 class="footer__title">📚 ExoCycle2</h4>
+            <h4 class="footer__title">📚 JeMEntraine</h4>
             <p class="footer__text">
               Des exercices gratuits pour apprendre en s'amusant, du CP au CE2.
             </p>
@@ -135,7 +135,7 @@ const fullTitle = title === "Accueil" ? "ExoCycle2 - Exercices Cycle 2" : `${tit
         </div>
         
         <div class="footer__bottom">
-          <p>© {new Date().getFullYear()} ExoCycle2 — Fait avec ❤️ pour les enfants</p>
+          <p>© {new Date().getFullYear()} JeMEntraine — Fait avec ❤️ pour les enfants</p>
         </div>
       </div>
     </footer>
