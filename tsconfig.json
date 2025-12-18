@@ -8,11 +8,12 @@
       "@layouts/*": ["src/layouts/*"],
       "@utils/*": ["src/utils/*"],
       "@types/*": ["src/types/*"],
-      "@content/*": ["content/*"]
+      "@content/*": ["content/*"],
+      "@config/*": ["config/*"]
     },
     "strictNullChecks": true,
     "noImplicitAny": true
   },
-  "include": ["src/**/*", "scripts/**/*", "content/**/*"],
+  "include": ["src/**/*", "scripts/**/*", "content/**/*", "config/**/*"],
   "exclude": ["node_modules", "dist"]
 }

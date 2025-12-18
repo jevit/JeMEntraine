@@ -1,8 +1,8 @@
 {
-  "name": "exocycle2",
+  "name": "jementraine",
   "type": "module",
   "version": "1.0.0",
-  "description": "Site éducatif Cycle 2 - Exercices CP/CE1/CE2",
+  "description": "JeMEntraine - Site éducatif Cycle 2 - Exercices CP/CE1/CE2",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",

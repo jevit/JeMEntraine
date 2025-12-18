@@ -64,7 +64,7 @@ jobs:
       #   with:
       #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       #     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      #     projectName: exocycle2
+      #     projectName: jementraine
       #     directory: dist
 
       # Ou décommenter pour Vercel

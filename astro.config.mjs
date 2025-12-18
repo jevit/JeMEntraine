@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://exocycle2.fr',
+  site: 'https://jementraine.fr',
   output: 'static',
   build: {
     inlineStylesheets: 'auto'
