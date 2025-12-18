@@ -12,10 +12,11 @@ import ce2Ex from '../../content/exercises/2025/01/ce2-multiplications.json';
 const exercises: Exercise[] = [cpEx, ce1Ex, ce2Ex] as Exercise[];
 const recentExercises = exercises.slice(0, 6);
 
+// Compteurs réels - nombre d'exercices existants par niveau
 const levelCounts: Record<Level, number> = {
-  CP: exercises.filter(e => e.level === 'CP').length * 40,
-  CE1: exercises.filter(e => e.level === 'CE1').length * 50,
-  CE2: exercises.filter(e => e.level === 'CE2').length * 60
+  CP: exercises.filter(e => e.level === 'CP').length,
+  CE1: exercises.filter(e => e.level === 'CE1').length,
+  CE2: exercises.filter(e => e.level === 'CE2').length
 };
 ---
 
@@ -30,27 +31,6 @@ const levelCounts: Record<Level, number> = {
         Choisis ton niveau et c'est parti ! 🚀
       </p>
       
-      <div class="search-box">
-        <form action="/recherche" method="GET" class="search-form">
-          <input 
-            type="search" 
-            name="q" 
-            class="search-input" 
-            placeholder="Cherche un exercice..."
-            aria-label="Rechercher un exercice"
-          />
-          <button type="submit" class="btn btn--primary">
-            🔍 Chercher
-          </button>
-        </form>
-        
-        <div class="filter-chips">
-          <a href="/cp/francais" class="filter-chip" data-domain="fr">📖 Français</a>
-          <a href="/cp/maths" class="filter-chip" data-domain="math">🧮 Maths</a>
-          <a href="/cp/qlm" class="filter-chip" data-domain="qlm">🌍 QLM</a>
-          <a href="/cp/emc" class="filter-chip" data-domain="emc">🤝 EMC</a>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -69,17 +49,18 @@ const levelCounts: Record<Level, number> = {
 
   <!-- Exercices récents -->
   <section class="section container">
-    <div class="section__header">
-      <h2 class="section__title">
-        <span>✨</span> Exercices récents
-      </h2>
-      <a href="/exercices" class="see-all-link">Voir tout →</a>
-    </div>
-    
+    <h2 class="section__title">
+      <span>✨</span> Exercices disponibles
+    </h2>
+
     <div class="exercise-grid">
-      {recentExercises.map((exercise) => (
-        <ExerciseCard exercise={exercise} />
-      ))}
+      {recentExercises.length > 0 ? (
+        recentExercises.map((exercise) => (
+          <ExerciseCard exercise={exercise} />
+        ))
+      ) : (
+        <p class="empty-message">Aucun exercice disponible pour le moment.</p>
+      )}
     </div>
   </section>
 
@@ -115,39 +96,6 @@ const levelCounts: Record<Level, number> = {
     </div>
   </section>
 
-  <!-- SEO Links -->
-  <section class="section container">
-    <h2 class="section__title">
-      <span>📖</span> Explorer par matière
-    </h2>
-    
-    <div class="seo-links">
-      <div class="seo-group">
-        <h3>CP</h3>
-        <ul>
-          <li><a href="/cp/francais">Exercices CP Français</a></li>
-          <li><a href="/cp/maths">Exercices CP Maths</a></li>
-          <li><a href="/cp/qlm">Exercices CP QLM</a></li>
-        </ul>
-      </div>
-      <div class="seo-group">
-        <h3>CE1</h3>
-        <ul>
-          <li><a href="/ce1/francais">Exercices CE1 Français</a></li>
-          <li><a href="/ce1/maths">Exercices CE1 Maths</a></li>
-          <li><a href="/ce1/qlm">Exercices CE1 QLM</a></li>
-        </ul>
-      </div>
-      <div class="seo-group">
-        <h3>CE2</h3>
-        <ul>
-          <li><a href="/ce2/francais">Exercices CE2 Français</a></li>
-          <li><a href="/ce2/maths">Exercices CE2 Maths</a></li>
-          <li><a href="/ce2/qlm">Exercices CE2 QLM</a></li>
-        </ul>
-      </div>
-    </div>
-  </section>
 </BaseLayout>
 
 <style>

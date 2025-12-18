@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ExerciseCard from '../../components/ExerciseCard.astro';
+import type { Exercise } from '../../types/exercise';
+
+// Import des exercices
+import ce1Ex from '../../../content/exercises/2025/01/ce1-sons-on-an.json';
+
+const exercises: Exercise[] = [ce1Ex] as Exercise[];
+const ce1Exercises = exercises.filter(e => e.level === 'CE1');
+---
+
+<BaseLayout
+  title="Exercices CE1"
+  description="Exercices gratuits pour le CE1 : lecture, grammaire, calcul, découverte du monde."
+>
+  <div class="level-page container">
+    <Breadcrumb items={[{ label: 'CE1' }]} />
+
+    <header class="level-header">
+      <span class="level-emoji">🐥</span>
+      <h1>Exercices CE1</h1>
+      <p class="level-description">
+        Tu es en CE1 ! Continue d'apprendre en t'amusant avec ces exercices.
+      </p>
+    </header>
+
+    <!-- Liste des exercices -->
+    <section class="exercises-section">
+      <h2 class="section-title">Tous les exercices CE1</h2>
+
+      {ce1Exercises.length > 0 ? (
+        <div class="exercise-grid">
+          {ce1Exercises.map((exercise) => (
+            <ExerciseCard exercise={exercise} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty-state">Les exercices arrivent bientôt !</p>
+      )}
+    </section>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .level-page {
+    padding: 2rem 0 4rem;
+  }
+
+  .level-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .level-emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .level-header h1 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--color-ce1);
+    margin-bottom: 0.5rem;
+  }
+
+  .level-description {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .exercises-section {
+    margin-top: 2rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+  }
+</style>
