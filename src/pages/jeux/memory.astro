@@ -40,8 +40,8 @@ const level = selectedExercise?.level || 'CP';
     </header>
     
     {selectedExercise ? (
-      <MemoryGame 
-        items={selectedExercise.items} 
+      <MemoryGame
+        questions={selectedExercise.questions}
         level={selectedExercise.level}
         title={selectedExercise.title}
       />

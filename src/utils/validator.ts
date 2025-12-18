@@ -12,7 +12,7 @@ export interface ValidationResult {
   warnings: ValidationError[];
 }
 
-const LEVEL_ITEM_CONSTRAINTS: Record<Level, { min: number; max: number }> = {
+const LEVEL_QUESTION_CONSTRAINTS: Record<Level, { min: number; max: number }> = {
   CP: { min: 6, max: 12 },
   CE1: { min: 8, max: 15 },
   CE2: { min: 12, max: 18 }
@@ -27,8 +27,8 @@ export function validateExercise(exercise: Exercise): ValidationResult {
 
   // 1. Vérification des champs obligatoires
   const requiredFields: (keyof Exercise)[] = [
-    'date', 'level', 'domain', 'skill', 'type', 
-    'title', 'slug', 'h1', 'instruction', 'items', 'correction', 'seo'
+    'date', 'level', 'domain', 'skill', 'type',
+    'title', 'slug', 'h1', 'instruction', 'questions', 'correction', 'seo'
   ];
 
   for (const field of requiredFields) {
@@ -41,66 +41,66 @@ export function validateExercise(exercise: Exercise): ValidationResult {
     }
   }
 
-  // 2. Vérification du nombre d'items selon le niveau
-  const constraints = LEVEL_ITEM_CONSTRAINTS[exercise.level];
+  // 2. Vérification du nombre de questions selon le niveau
+  const constraints = LEVEL_QUESTION_CONSTRAINTS[exercise.level];
   if (constraints) {
-    const itemCount = exercise.items?.length ?? 0;
-    if (itemCount < constraints.min) {
+    const questionCount = exercise.questions?.length ?? 0;
+    if (questionCount < constraints.min) {
       errors.push({
-        field: 'items',
-        message: `Niveau ${exercise.level}: minimum ${constraints.min} items requis, ${itemCount} fournis`,
+        field: 'questions',
+        message: `Niveau ${exercise.level}: minimum ${constraints.min} questions requises, ${questionCount} fournies`,
         severity: 'error'
       });
     }
-    if (itemCount > constraints.max) {
+    if (questionCount > constraints.max) {
       warnings.push({
-        field: 'items',
-        message: `Niveau ${exercise.level}: maximum ${constraints.max} items recommandé, ${itemCount} fournis`,
+        field: 'questions',
+        message: `Niveau ${exercise.level}: maximum ${constraints.max} questions recommandé, ${questionCount} fournies`,
         severity: 'warning'
       });
     }
   }
 
-  // 3. Vérification que chaque item a q et a non vides
-  if (exercise.items) {
-    exercise.items.forEach((item, index) => {
-      if (!item.q || item.q.trim() === '') {
+  // 3. Vérification que chaque question a prompt et answer non vides
+  if (exercise.questions) {
+    exercise.questions.forEach((question, index) => {
+      if (!question.prompt || question.prompt.trim() === '') {
         errors.push({
-          field: `items[${index}].q`,
-          message: `Item ${index + 1}: la question est vide`,
+          field: `questions[${index}].prompt`,
+          message: `Question ${index + 1}: le prompt est vide`,
           severity: 'error'
         });
       }
-      if (!item.a || item.a.trim() === '') {
+      if (!question.answer || question.answer.trim() === '') {
         errors.push({
-          field: `items[${index}].a`,
-          message: `Item ${index + 1}: la réponse est vide`,
+          field: `questions[${index}].answer`,
+          message: `Question ${index + 1}: la réponse est vide`,
           severity: 'error'
         });
       }
     });
   }
 
-  // 4. Vérification de la cohérence correction / items
-  if (exercise.correction && exercise.items) {
+  // 4. Vérification de la cohérence correction / questions
+  if (exercise.correction && exercise.questions) {
     if (exercise.correction.mode === 'list') {
       const correctionCount = exercise.correction.v.length;
-      const itemCount = exercise.items.length;
-      if (correctionCount !== itemCount) {
+      const questionCount = exercise.questions.length;
+      if (correctionCount !== questionCount) {
         errors.push({
           field: 'correction',
-          message: `Incohérence: ${itemCount} items mais ${correctionCount} réponses dans la correction`,
+          message: `Incohérence: ${questionCount} questions mais ${correctionCount} réponses dans la correction`,
           severity: 'error'
         });
       }
 
-      // Vérifier que chaque correction correspond à la réponse de l'item
-      exercise.items.forEach((item, index) => {
+      // Vérifier que chaque correction correspond à la réponse de la question
+      exercise.questions.forEach((question, index) => {
         const correctionValue = exercise.correction.v[index];
-        if (correctionValue && item.a !== correctionValue) {
+        if (correctionValue && question.answer !== correctionValue) {
           warnings.push({
             field: `correction.v[${index}]`,
-            message: `Item ${index + 1}: réponse "${item.a}" différente de correction "${correctionValue}"`,
+            message: `Question ${index + 1}: réponse "${question.answer}" différente de correction "${correctionValue}"`,
             severity: 'warning'
           });
         }
@@ -109,23 +109,23 @@ export function validateExercise(exercise: Exercise): ValidationResult {
   }
 
   // 5. Vérification unicité pour exercices "relier"
-  if (exercise.type === 'relier' && exercise.items) {
-    const answers = exercise.items.map(i => i.a);
+  if (exercise.type === 'relier' && exercise.questions) {
+    const answers = exercise.questions.map(q => q.answer);
     const uniqueAnswers = new Set(answers);
     if (answers.length !== uniqueAnswers.size) {
       errors.push({
-        field: 'items',
+        field: 'questions',
         message: 'Exercice "relier": les réponses doivent être uniques (relation 1-1)',
         severity: 'error'
       });
     }
 
     // Vérifier que les paires sont définies
-    const itemsWithoutPair = exercise.items.filter(i => !i.pair);
-    if (itemsWithoutPair.length > 0) {
+    const questionsWithoutPair = exercise.questions.filter(q => !q.pair);
+    if (questionsWithoutPair.length > 0) {
       errors.push({
-        field: 'items',
-        message: `Exercice "relier": ${itemsWithoutPair.length} item(s) sans "pair" défini`,
+        field: 'questions',
+        message: `Exercice "relier": ${questionsWithoutPair.length} question(s) sans "pair" défini`,
         severity: 'error'
       });
     }

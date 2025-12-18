@@ -1,13 +1,13 @@
 ---
-import type { ExerciseItem, Level } from '../types/exercise';
+import type { Question, Level } from '../types/exercise';
 
 interface Props {
-  items: ExerciseItem[];
+  questions: Question[];
   level: Level;
   title: string;
 }
 
-const { items, level, title } = Astro.props;
+const { questions, level, title } = Astro.props;
 const quizId = `quiz-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
@@ -18,7 +18,7 @@ const quizId = `quiz-${Math.random().toString(36).slice(2, 9)}`;
       <div class="quiz-progress-bar">
         <div class="quiz-progress-fill"></div>
       </div>
-      <span class="quiz-progress-text">1 / {items.length}</span>
+      <span class="quiz-progress-text">1 / {questions.length}</span>
     </div>
   </div>
   
@@ -43,16 +43,16 @@ const quizId = `quiz-${Math.random().toString(36).slice(2, 9)}`;
   </div>
 </div>
 
-<script define:vars={{ items, quizId }}>
+<script define:vars={{ questions, quizId }}>
   const container = document.getElementById(quizId);
   if (!container) throw new Error('Quiz container not found');
 
   let currentIndex = 0;
   let score = 0;
   let hasAnswered = false;
-  
-  const shuffledItems = [...items].sort(() => Math.random() - 0.5).slice(0, 10);
-  
+
+  const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5).slice(0, 10);
+
   const progressFill = container.querySelector('.quiz-progress-fill');
   const progressText = container.querySelector('.quiz-progress-text');
   const questionEl = container.querySelector('.quiz-question');
@@ -61,17 +61,17 @@ const quizId = `quiz-${Math.random().toString(36).slice(2, 9)}`;
   const scoreEl = container.querySelector('.quiz-score');
   const contentEl = container.querySelector('.quiz-content');
 
-  function generateOptions(correct, allItems) {
+  function generateOptions(correct, allQuestions) {
     const opts = new Set([correct]);
     const num = parseInt(correct);
-    
+
     if (!isNaN(num)) {
       while (opts.size < 4) {
         const delta = Math.floor(Math.random() * 6) - 3;
         if (delta !== 0) opts.add(String(num + delta));
       }
     } else {
-      const others = allItems.map(i => i.a).filter(a => a !== correct);
+      const others = allQuestions.map(q => q.answer).filter(a => a !== correct);
       others.sort(() => Math.random() - 0.5);
       for (const o of others) {
         if (opts.size >= 4) break;
@@ -82,33 +82,33 @@ const quizId = `quiz-${Math.random().toString(36).slice(2, 9)}`;
   }
 
   function showQuestion() {
-    const item = shuffledItems[currentIndex];
-    if (!item) return showScore();
-    
+    const question = shuffledQuestions[currentIndex];
+    if (!question) return showScore();
+
     hasAnswered = false;
-    const progress = ((currentIndex) / shuffledItems.length) * 100;
+    const progress = ((currentIndex) / shuffledQuestions.length) * 100;
     progressFill.style.width = `${progress}%`;
-    progressText.textContent = `${currentIndex + 1} / ${shuffledItems.length}`;
-    questionEl.textContent = item.q;
+    progressText.textContent = `${currentIndex + 1} / ${shuffledQuestions.length}`;
+    questionEl.textContent = question.prompt;
     feedbackEl.hidden = true;
-    
-    const options = item.options || generateOptions(item.a, shuffledItems);
-    answersEl.innerHTML = options.map(opt => 
+
+    const options = question.options || generateOptions(question.answer, shuffledQuestions);
+    answersEl.innerHTML = options.map(opt =>
       `<button class="quiz-answer" data-value="${opt}">${opt}</button>`
     ).join('');
-    
+
     answersEl.querySelectorAll('.quiz-answer').forEach(btn => {
-      btn.addEventListener('click', () => handleAnswer(btn, item.a));
+      btn.addEventListener('click', () => handleAnswer(btn, question.answer));
     });
   }
 
   function handleAnswer(btn, correct) {
     if (hasAnswered) return;
     hasAnswered = true;
-    
+
     const value = btn.dataset.value;
     const isCorrect = value === correct;
-    
+
     if (isCorrect) {
       score++;
       btn.classList.add('correct');
@@ -122,12 +122,12 @@ const quizId = `quiz-${Math.random().toString(36).slice(2, 9)}`;
       feedbackEl.querySelector('.feedback-icon').textContent = '❌';
       feedbackEl.querySelector('.feedback-text').textContent = `La réponse était : ${correct}`;
     }
-    
+
     feedbackEl.hidden = false;
-    
+
     setTimeout(() => {
       currentIndex++;
-      if (currentIndex < shuffledItems.length) {
+      if (currentIndex < shuffledQuestions.length) {
         showQuestion();
       } else {
         showScore();
@@ -139,15 +139,15 @@ const quizId = `quiz-${Math.random().toString(36).slice(2, 9)}`;
     contentEl.hidden = true;
     scoreEl.hidden = false;
     progressFill.style.width = '100%';
-    
-    const pct = Math.round((score / shuffledItems.length) * 100);
-    scoreEl.querySelector('.score-value').textContent = `${score} / ${shuffledItems.length}`;
-    
+
+    const pct = Math.round((score / shuffledQuestions.length) * 100);
+    scoreEl.querySelector('.score-value').textContent = `${score} / ${shuffledQuestions.length}`;
+
     let emoji = '🎉';
     let msg = 'Super champion !';
     if (pct < 50) { emoji = '💪'; msg = 'Continue, tu vas y arriver !'; }
     else if (pct < 80) { emoji = '👍'; msg = 'Bien joué !'; }
-    
+
     scoreEl.querySelector('.score-emoji').textContent = emoji;
     scoreEl.querySelector('.score-message').textContent = msg;
   }
@@ -155,7 +155,7 @@ const quizId = `quiz-${Math.random().toString(36).slice(2, 9)}`;
   container.querySelector('.replay-btn')?.addEventListener('click', () => {
     currentIndex = 0;
     score = 0;
-    shuffledItems.sort(() => Math.random() - 0.5);
+    shuffledQuestions.sort(() => Math.random() - 0.5);
     contentEl.hidden = false;
     scoreEl.hidden = true;
     showQuestion();

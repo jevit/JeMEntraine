@@ -11,11 +11,11 @@ import * as path from 'path';
 
 // Types inline pour éviter les problèmes d'import
 type Level = "CP" | "CE1" | "CE2";
-type Domain = "fr" | "math" | "qlm" | "emc" | "lv";
+type Domain = "francais" | "maths" | "questionner-le-monde" | "emc" | "anglais" | "arts" | "eps";
 
-interface ExerciseItem {
-  q: string;
-  a: string;
+interface Question {
+  prompt: string;
+  answer: string;
   hint?: string;
   options?: string[];
   pair?: string;
@@ -32,7 +32,7 @@ interface Exercise {
   slug: string;
   h1: string;
   instruction: string;
-  items: ExerciseItem[];
+  questions: Question[];
   correction: { mode: "list" | "short_text"; v: string[] | string };
   seo: {
     title: string;
@@ -61,53 +61,53 @@ function validateExercise(exercise: Exercise, filename: string): ValidationError
   const errors: ValidationError[] = [];
 
   // Champs obligatoires
-  const required = ['date', 'level', 'domain', 'skill', 'type', 'title', 'slug', 'h1', 'instruction', 'items', 'correction', 'seo'];
+  const required = ['date', 'level', 'domain', 'skill', 'type', 'title', 'slug', 'h1', 'instruction', 'questions', 'correction', 'seo'];
   for (const field of required) {
     if (!(exercise as any)[field]) {
       errors.push({ field, message: `Champ "${field}" manquant`, severity: 'error' });
     }
   }
 
-  // Nombre d'items par niveau
-  if (exercise.level && exercise.items) {
+  // Nombre de questions par niveau
+  if (exercise.level && exercise.questions) {
     const constraints = LEVEL_CONSTRAINTS[exercise.level];
     if (constraints) {
-      if (exercise.items.length < constraints.min) {
+      if (exercise.questions.length < constraints.min) {
         errors.push({
-          field: 'items',
-          message: `${exercise.level}: min ${constraints.min} items requis, ${exercise.items.length} trouvés`,
+          field: 'questions',
+          message: `${exercise.level}: min ${constraints.min} questions requises, ${exercise.questions.length} trouvées`,
           severity: 'error'
         });
       }
-      if (exercise.items.length > constraints.max) {
+      if (exercise.questions.length > constraints.max) {
         errors.push({
-          field: 'items',
-          message: `${exercise.level}: max ${constraints.max} items recommandé, ${exercise.items.length} trouvés`,
+          field: 'questions',
+          message: `${exercise.level}: max ${constraints.max} questions recommandé, ${exercise.questions.length} trouvées`,
           severity: 'warning'
         });
       }
     }
   }
 
-  // Items non vides
-  if (exercise.items) {
-    exercise.items.forEach((item, i) => {
-      if (!item.q?.trim()) {
-        errors.push({ field: `items[${i}].q`, message: `Item ${i + 1}: question vide`, severity: 'error' });
+  // Questions non vides
+  if (exercise.questions) {
+    exercise.questions.forEach((question, i) => {
+      if (!question.prompt?.trim()) {
+        errors.push({ field: `questions[${i}].prompt`, message: `Question ${i + 1}: prompt vide`, severity: 'error' });
       }
-      if (!item.a?.trim()) {
-        errors.push({ field: `items[${i}].a`, message: `Item ${i + 1}: réponse vide`, severity: 'error' });
+      if (!question.answer?.trim()) {
+        errors.push({ field: `questions[${i}].answer`, message: `Question ${i + 1}: réponse vide`, severity: 'error' });
       }
     });
   }
 
-  // Cohérence correction / items
-  if (exercise.correction && exercise.items) {
+  // Cohérence correction / questions
+  if (exercise.correction && exercise.questions) {
     if (exercise.correction.mode === 'list' && Array.isArray(exercise.correction.v)) {
-      if (exercise.correction.v.length !== exercise.items.length) {
+      if (exercise.correction.v.length !== exercise.questions.length) {
         errors.push({
           field: 'correction',
-          message: `${exercise.items.length} items mais ${exercise.correction.v.length} corrections`,
+          message: `${exercise.questions.length} questions mais ${exercise.correction.v.length} corrections`,
           severity: 'error'
         });
       }

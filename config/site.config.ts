@@ -13,11 +13,13 @@ export const SITE_CONFIG = {
 
   // Domaines
   domains: {
-    fr: { label: 'Français', emoji: '📖' },
-    math: { label: 'Mathématiques', emoji: '🧮' },
-    qlm: { label: 'Questionner le monde', emoji: '🌍' },
+    francais: { label: 'Français', emoji: '📖' },
+    maths: { label: 'Mathématiques', emoji: '🧮' },
+    'questionner-le-monde': { label: 'Questionner le monde', emoji: '🌍' },
     emc: { label: 'EMC', emoji: '🤝' },
-    lv: { label: 'Anglais', emoji: '🇬🇧' }
+    anglais: { label: 'Anglais', emoji: '🇬🇧' },
+    arts: { label: 'Arts', emoji: '🎨' },
+    eps: { label: 'EPS', emoji: '⚽' }
   },
 
   // Couleurs par niveau

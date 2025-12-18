@@ -1,16 +1,16 @@
 ---
-import type { Correction, ExerciseItem } from '../types/exercise';
+import type { Correction, Question } from '../types/exercise';
 
 interface Props {
   correction: Correction;
-  items: ExerciseItem[];
+  questions: Question[];
 }
 
-const { correction, items } = Astro.props;
+const { correction, questions } = Astro.props;
 ---
 
 <div class="correction-section">
-  <button 
+  <button
     type="button"
     class="correction-toggle"
     aria-expanded="false"
@@ -19,14 +19,14 @@ const { correction, items } = Astro.props;
     <span>✅ Voir la correction</span>
     <span class="correction-toggle__icon">▼</span>
   </button>
-  
+
   <div id="correction-content" class="correction-content" hidden>
     {correction.mode === 'list' ? (
       <ul class="correction-list">
-        {items.map((item, index) => (
+        {questions.map((question, index) => (
           <li class="correction-item">
             <span class="correction-number">{index + 1}.</span>
-            <span class="correction-question">{item.q}</span>
+            <span class="correction-question">{question.prompt}</span>
             <span class="correction-answer">{correction.v[index]}</span>
           </li>
         ))}

@@ -48,8 +48,8 @@ const title = selectedExercise?.title || 'Quiz';
     </header>
     
     {selectedExercise ? (
-      <QuizGame 
-        items={selectedExercise.items} 
+      <QuizGame
+        questions={selectedExercise.questions}
         level={selectedExercise.level}
         title={selectedExercise.title}
       />

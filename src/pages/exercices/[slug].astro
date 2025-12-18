@@ -40,7 +40,7 @@ const relatedExercises = exercises
 // Breadcrumb
 const breadcrumbItems = [
   { label: exercise.level, href: `/${exercise.level.toLowerCase()}` },
-  { label: domainLabels[exercise.domain], href: `/${exercise.level.toLowerCase()}/${exercise.domain === 'fr' ? 'francais' : exercise.domain === 'math' ? 'maths' : exercise.domain}` },
+  { label: domainLabels[exercise.domain], href: `/${exercise.level.toLowerCase()}/${exercise.domain}` },
   { label: exercise.title }
 ];
 ---
@@ -55,9 +55,9 @@ const breadcrumbItems = [
     <article>
       <ExerciseHeader exercise={exercise} />
       
-      <ExerciseItems items={exercise.items} interactive={true} />
-      
-      <CorrectionToggle correction={exercise.correction} items={exercise.items} />
+      <ExerciseItems questions={exercise.questions} interactive={true} />
+
+      <CorrectionToggle correction={exercise.correction} questions={exercise.questions} />
       
       <!-- Actions -->
       <div class="exercise-actions no-print">

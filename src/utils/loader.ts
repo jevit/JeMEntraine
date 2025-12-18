@@ -152,10 +152,12 @@ export async function countByLevel(): Promise<Record<Level, number>> {
 export async function countByDomain(): Promise<Record<Domain, number>> {
   const all = await loadAllExercises();
   return {
-    fr: all.filter(e => e.domain === 'fr').length,
-    math: all.filter(e => e.domain === 'math').length,
-    qlm: all.filter(e => e.domain === 'qlm').length,
+    francais: all.filter(e => e.domain === 'francais').length,
+    maths: all.filter(e => e.domain === 'maths').length,
+    "questionner-le-monde": all.filter(e => e.domain === 'questionner-le-monde').length,
     emc: all.filter(e => e.domain === 'emc').length,
-    lv: all.filter(e => e.domain === 'lv').length
+    anglais: all.filter(e => e.domain === 'anglais').length,
+    arts: all.filter(e => e.domain === 'arts').length,
+    eps: all.filter(e => e.domain === 'eps').length
   };
 }

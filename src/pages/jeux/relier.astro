@@ -40,8 +40,8 @@ const level = selectedExercise?.level || 'CP';
     </header>
     
     {selectedExercise ? (
-      <MatchingGame 
-        items={selectedExercise.items} 
+      <MatchingGame
+        questions={selectedExercise.questions}
         level={selectedExercise.level}
         title={selectedExercise.title}
       />

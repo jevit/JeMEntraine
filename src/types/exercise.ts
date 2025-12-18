@@ -2,9 +2,9 @@
 
 export type Level = "CP" | "CE1" | "CE2";
 
-export type Domain = "fr" | "math" | "qlm" | "emc" | "lv";
+export type Domain = "francais" | "maths" | "questionner-le-monde" | "emc" | "anglais" | "arts" | "eps";
 
-export type ExerciseType = 
+export type ExerciseType =
   | "calcul-mental"
   | "phrases-a-trous"
   | "qcm"
@@ -21,11 +21,11 @@ export type ExerciseType =
   | "geometrie"
   | "mesures";
 
-export interface ExerciseItem {
-  /** Question courte */
-  q: string;
+export interface Question {
+  /** Question/prompt affiché */
+  prompt: string;
   /** Réponse exacte */
-  a: string;
+  answer: string;
   /** Indice court optionnel */
   hint?: string;
   /** Options pour QCM (si applicable) */
@@ -75,8 +75,8 @@ export interface Exercise {
   h1: string;
   /** Consigne pour l'élève */
   instruction: string;
-  /** Liste des items/questions */
-  items: ExerciseItem[];
+  /** Liste des questions */
+  questions: Question[];
   /** Correction */
   correction: Correction;
   /** Métadonnées SEO */
@@ -85,19 +85,23 @@ export interface Exercise {
 
 // Constantes pour les domaines
 export const DOMAIN_LABELS: Record<Domain, string> = {
-  fr: "Français",
-  math: "Mathématiques",
-  qlm: "Questionner le monde",
+  francais: "Français",
+  maths: "Mathématiques",
+  "questionner-le-monde": "Questionner le monde",
   emc: "EMC",
-  lv: "Anglais"
+  anglais: "Anglais",
+  arts: "Arts",
+  eps: "EPS"
 };
 
 export const DOMAIN_EMOJIS: Record<Domain, string> = {
-  fr: "📖",
-  math: "🧮",
-  qlm: "🌍",
+  francais: "📖",
+  maths: "🧮",
+  "questionner-le-monde": "🌍",
   emc: "🤝",
-  lv: "🇬🇧"
+  anglais: "🇬🇧",
+  arts: "🎨",
+  eps: "⚽"
 };
 
 export const LEVEL_EMOJIS: Record<Level, string> = {

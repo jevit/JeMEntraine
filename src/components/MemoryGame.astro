@@ -1,13 +1,13 @@
 ---
-import type { ExerciseItem, Level } from '../types/exercise';
+import type { Question, Level } from '../types/exercise';
 
 interface Props {
-  items: ExerciseItem[];
+  questions: Question[];
   level: Level;
   title: string;
 }
 
-const { items, level, title } = Astro.props;
+const { questions, level, title } = Astro.props;
 const memoryId = `memory-${Math.random().toString(36).slice(2, 9)}`;
 const pairCount = level === 'CP' ? 4 : level === 'CE1' ? 6 : 8;
 ---
@@ -31,7 +31,7 @@ const pairCount = level === 'CP' ? 4 : level === 'CE1' ? 6 : 8;
   </div>
 </div>
 
-<script define:vars={{ items, memoryId, pairCount }}>
+<script define:vars={{ questions, memoryId, pairCount }}>
   const container = document.getElementById(memoryId);
   if (!container) throw new Error('Memory container not found');
 
@@ -60,19 +60,19 @@ const pairCount = level === 'CP' ? 4 : level === 'CE1' ? 6 : 8;
     moves = 0;
     flippedCards = [];
     isLocked = false;
-    
+
     pairsDisplay.textContent = '0';
     movesDisplay.textContent = '0';
     winEl.hidden = true;
-    
-    const selectedItems = shuffle(items).slice(0, pairCount);
-    
+
+    const selectedQuestions = shuffle(questions).slice(0, pairCount);
+
     cards = [];
-    selectedItems.forEach((item, idx) => {
-      cards.push({ id: `q-${idx}`, pairId: idx, content: item.q, type: 'question' });
-      cards.push({ id: `a-${idx}`, pairId: idx, content: item.a, type: 'answer' });
+    selectedQuestions.forEach((question, idx) => {
+      cards.push({ id: `q-${idx}`, pairId: idx, content: question.prompt, type: 'question' });
+      cards.push({ id: `a-${idx}`, pairId: idx, content: question.answer, type: 'answer' });
     });
-    
+
     cards = shuffle(cards);
     renderGrid();
   }

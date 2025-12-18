@@ -123,22 +123,26 @@ export function capitalize(text: string): string {
  * Labels des domaines
  */
 export const domainLabels: Record<Domain, string> = {
-  fr: 'Français',
-  math: 'Mathématiques',
-  qlm: 'Questionner le monde',
+  francais: 'Français',
+  maths: 'Mathématiques',
+  'questionner-le-monde': 'Questionner le monde',
   emc: 'EMC',
-  lv: 'Anglais'
+  anglais: 'Anglais',
+  arts: 'Arts',
+  eps: 'EPS'
 };
 
 /**
  * Emojis des domaines
  */
 export const domainEmojis: Record<Domain, string> = {
-  fr: '📖',
-  math: '🧮',
-  qlm: '🌍',
+  francais: '📖',
+  maths: '🧮',
+  'questionner-le-monde': '🌍',
   emc: '🤝',
-  lv: '🇬🇧'
+  anglais: '🇬🇧',
+  arts: '🎨',
+  eps: '⚽'
 };
 
 /**
@@ -163,9 +167,11 @@ export const levelColors: Record<Level, string> = {
  * Couleurs des domaines
  */
 export const domainColors: Record<Domain, string> = {
-  fr: '#f59e0b',
-  math: '#3b82f6',
-  qlm: '#10b981',
+  francais: '#f59e0b',
+  maths: '#3b82f6',
+  'questionner-le-monde': '#10b981',
   emc: '#8b5cf6',
-  lv: '#ec4899'
+  anglais: '#ec4899',
+  arts: '#f97316',
+  eps: '#22c55e'
 };

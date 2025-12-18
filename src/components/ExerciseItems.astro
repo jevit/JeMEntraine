@@ -9,19 +9,19 @@
  * - Zones de clic larges pour enfants
  * - Progression visuelle
  */
-import type { ExerciseItem } from '../types/exercise';
+import type { Question } from '../types/exercise';
 
 interface Props {
-  items: ExerciseItem[];
+  questions: Question[];
   interactive?: boolean;
   showProgress?: boolean;
 }
 
-const { items, interactive = true, showProgress = true } = Astro.props;
-const totalItems = items.length;
+const { questions, interactive = true, showProgress = true } = Astro.props;
+const totalQuestions = questions.length;
 ---
 
-<div class="exercise-items" data-total={totalItems}>
+<div class="exercise-items" data-total={totalQuestions}>
   {/* Barre de progression pour encourager */}
   {showProgress && (
     <div class="exercise-progress" aria-hidden="true">
@@ -29,32 +29,32 @@ const totalItems = items.length;
         <div class="progress__bar" style="width: 0%" data-progress-bar></div>
       </div>
       <p class="exercise-progress__text">
-        <span data-answered>0</span> / {totalItems} questions
+        <span data-answered>0</span> / {totalQuestions} questions
       </p>
     </div>
   )}
 
-  {items.map((item, index) => (
+  {questions.map((question, index) => (
     <article
       class="exercise-item animate-slideUp"
       data-index={index}
       style={`animation-delay: ${index * 80}ms`}
-      aria-label={`Question ${index + 1} sur ${totalItems}`}
+      aria-label={`Question ${index + 1} sur ${totalQuestions}`}
     >
       <div class="item-number" aria-hidden="true">{index + 1}</div>
 
       <div class="item-content">
-        <p class="item-question" id={`question-${index}`}>{item.q}</p>
+        <p class="item-question" id={`question-${index}`}>{question.prompt}</p>
 
-        {interactive && !item.options && (
+        {interactive && !question.options && (
           <div class="item-input-wrapper">
             <input
               type="text"
               class="item-input"
               placeholder="Écris ta réponse ici..."
-              data-answer={item.a}
+              data-answer={question.answer}
               aria-labelledby={`question-${index}`}
-              aria-describedby={item.hint ? `hint-${index}` : undefined}
+              aria-describedby={question.hint ? `hint-${index}` : undefined}
               autocomplete="off"
               spellcheck="false"
             />
@@ -62,14 +62,14 @@ const totalItems = items.length;
           </div>
         )}
 
-        {item.options && item.options.length > 0 && (
+        {question.options && question.options.length > 0 && (
           <div class="item-options" role="group" aria-labelledby={`question-${index}`}>
-            {item.options.map((option, optIndex) => (
+            {question.options.map((option, optIndex) => (
               <button
                 type="button"
                 class="item-option"
                 data-value={option}
-                data-correct={option === item.a}
+                data-correct={option === question.answer}
                 aria-pressed="false"
               >
                 <span class="item-option__letter">{String.fromCharCode(65 + optIndex)}</span>
@@ -79,14 +79,14 @@ const totalItems = items.length;
           </div>
         )}
 
-        {item.hint && (
+        {question.hint && (
           <details class="item-hint-toggle">
             <summary class="item-hint-btn">
               <span class="item-hint-btn__icon">💡</span>
               <span>Besoin d'aide ?</span>
             </summary>
             <p class="item-hint" id={`hint-${index}`}>
-              {item.hint}
+              {question.hint}
             </p>
           </details>
         )}

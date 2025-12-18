@@ -1,13 +1,13 @@
 ---
-import type { ExerciseItem, Level } from '../types/exercise';
+import type { Question, Level } from '../types/exercise';
 
 interface Props {
-  items: ExerciseItem[];
+  questions: Question[];
   level: Level;
   title: string;
 }
 
-const { items, level, title } = Astro.props;
+const { questions, level, title } = Astro.props;
 const matchingId = `matching-${Math.random().toString(36).slice(2, 9)}`;
 const pairCount = level === 'CP' ? 4 : level === 'CE1' ? 5 : 6;
 ---
@@ -43,7 +43,7 @@ const pairCount = level === 'CP' ? 4 : level === 'CE1' ? 5 : 6;
   </div>
 </div>
 
-<script define:vars={{ items, matchingId, pairCount }}>
+<script define:vars={{ questions, matchingId, pairCount }}>
   const container = document.getElementById(matchingId);
   if (!container) throw new Error('Matching container not found');
 
@@ -73,19 +73,19 @@ const pairCount = level === 'CP' ? 4 : level === 'CE1' ? 5 : 6;
     scoreDisplay.textContent = '0';
     winEl.hidden = true;
     linesSvg.innerHTML = '';
-    
-    const selectedItems = shuffle(items).slice(0, pairCount);
-    
-    const leftItems = selectedItems.map((item, idx) => ({
+
+    const selectedQuestions = shuffle(questions).slice(0, pairCount);
+
+    const leftItems = selectedQuestions.map((question, idx) => ({
       id: `left-${idx}`,
       pairId: idx,
-      content: item.q
+      content: question.prompt
     }));
-    
-    const rightItems = shuffle(selectedItems.map((item, idx) => ({
+
+    const rightItems = shuffle(selectedQuestions.map((question, idx) => ({
       id: `right-${idx}`,
       pairId: idx,
-      content: item.a
+      content: question.answer
     })));
     
     leftCol.innerHTML = leftItems.map(item => `
