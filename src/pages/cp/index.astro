@@ -1,10 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import FilterBar from '../../components/FilterBar.astro';
 import ExerciseCard from '../../components/ExerciseCard.astro';
 import type { Exercise } from '../../types/exercise';
-import { domainLabels, domainEmojis } from '../../utils/helpers';
 
 // Import des exercices
 import cpEx from '../../../content/exercises/2025/01/cp-additions-10.json';
@@ -35,28 +33,6 @@ const byDomain = cpExercises.reduce((acc, ex) => {
       </p>
     </header>
     
-    <FilterBar currentLevel="CP" showLevels={false} />
-    
-    <!-- Par matière -->
-    <nav class="domain-nav">
-      <a href="/cp/francais" class="domain-link" data-domain="fr">
-        <span>{domainEmojis.fr}</span>
-        <span>Français</span>
-      </a>
-      <a href="/cp/maths" class="domain-link" data-domain="math">
-        <span>{domainEmojis.math}</span>
-        <span>Maths</span>
-      </a>
-      <a href="/cp/qlm" class="domain-link" data-domain="qlm">
-        <span>{domainEmojis.qlm}</span>
-        <span>QLM</span>
-      </a>
-      <a href="/cp/emc" class="domain-link" data-domain="emc">
-        <span>{domainEmojis.emc}</span>
-        <span>EMC</span>
-      </a>
-    </nav>
-    
     <!-- Liste des exercices -->
     <section class="exercises-section">
       <h2 class="section-title">📝 Tous les exercices CP</h2>
@@ -72,18 +48,6 @@ const byDomain = cpExercises.reduce((acc, ex) => {
       )}
     </section>
     
-    <!-- SEO Hub Links -->
-    <section class="hub-links">
-      <h2>Fiches CP par thème</h2>
-      <div class="hub-grid">
-        <a href="/cp/francais/lecture" class="hub-link">Lecture CP</a>
-        <a href="/cp/francais/ecriture" class="hub-link">Écriture CP</a>
-        <a href="/cp/francais/phonologie" class="hub-link">Sons et syllabes CP</a>
-        <a href="/cp/maths/calcul-mental" class="hub-link">Calcul mental CP</a>
-        <a href="/cp/maths/numeration" class="hub-link">Numération CP</a>
-        <a href="/cp/maths/problemes" class="hub-link">Problèmes CP</a>
-      </div>
-    </section>
   </div>
 </BaseLayout>
 
