@@ -16,6 +16,7 @@
  *   Les prompts, compétences et paramètres SEO sont dans /config/
  */
 
+import 'dotenv/config';
 import * as fs from 'fs';
 import * as path from 'path';
 
