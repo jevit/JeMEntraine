@@ -1,0 +1,37 @@
+{
+  "date": "2025-01-15",
+  "level": "CE1",
+  "domain": "fr",
+  "skill": "Distinguer les sons [on] et [an]",
+  "type": "phrases-a-trous",
+  "theme": "Hiver",
+  "title": "Les sons [on] et [an]",
+  "slug": "20250115-sons-on-an-ce1",
+  "h1": "Les sons [on] et [an] - CE1",
+  "instruction": "Complète chaque mot avec le bon son : ON ou AN.",
+  "items": [
+    { "q": "Le bal___ flotte dans le ciel.", "a": "on" },
+    { "q": "Le pap___ vole de fleur en fleur.", "a": "on" },
+    { "q": "L'élép___ a une longue trompe.", "a": "ant" },
+    { "q": "Mam___ prépare le goûter.", "a": "an" },
+    { "q": "Le vent___ souffle très fort.", "a": "on" },
+    { "q": "Le can___ nage dans la mare.", "a": "ard" },
+    { "q": "Le li___ est le roi des animaux.", "a": "on" },
+    { "q": "Le drag___ crache du feu.", "a": "on" },
+    { "q": "Un enf___ joue dans le parc.", "a": "ant" },
+    { "q": "Le pois___ nage dans l'eau.", "a": "son" },
+    { "q": "Ma t___ te m'a offert un cadeau.", "a": "an" },
+    { "q": "Le cit___ est un fruit jaune.", "a": "ron" }
+  ],
+  "correction": {
+    "mode": "list",
+    "v": ["on", "on", "ant", "an", "on", "ard", "on", "on", "ant", "son", "an", "ron"]
+  },
+  "seo": {
+    "title": "Exercices sons ON et AN - CE1 Français",
+    "description": "Exercices gratuits pour distinguer les sons ON et AN en CE1. Complète les mots avec la bonne graphie. Phonologie cycle 2.",
+    "tags": ["phonologie", "CE1", "sons", "ON", "AN", "français", "orthographe", "cycle 2"],
+    "internalLinks": ["/ce1/francais", "/ce1/francais/phonologie"],
+    "nextSuggestions": ["20250116-sons-in-ce1", "20250117-sons-ou-ce1"]
+  }
+}

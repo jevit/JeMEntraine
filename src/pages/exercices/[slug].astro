@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ExerciseHeader from '../../components/ExerciseHeader.astro';
+import ExerciseItems from '../../components/ExerciseItems.astro';
+import CorrectionToggle from '../../components/CorrectionToggle.astro';
+import ExerciseCard from '../../components/ExerciseCard.astro';
+import type { Exercise } from '../../types/exercise';
+import { domainLabels } from '../../utils/helpers';
+
+// Import statique des exercices
+import cpEx from '../../../content/exercises/2025/01/cp-additions-10.json';
+import ce1Ex from '../../../content/exercises/2025/01/ce1-sons-on-an.json';
+import ce2Ex from '../../../content/exercises/2025/01/ce2-multiplications.json';
+
+const exercises: Exercise[] = [cpEx, ce1Ex, ce2Ex] as Exercise[];
+
+export function getStaticPaths() {
+  // En production, charger dynamiquement tous les exercices
+  const cpEx = require('../../../content/exercises/2025/01/cp-additions-10.json');
+  const ce1Ex = require('../../../content/exercises/2025/01/ce1-sons-on-an.json');
+  const ce2Ex = require('../../../content/exercises/2025/01/ce2-multiplications.json');
+  
+  const exercises = [cpEx, ce1Ex, ce2Ex];
+  
+  return exercises.map((exercise) => ({
+    params: { slug: exercise.slug },
+    props: { exercise }
+  }));
+}
+
+interface Props {
+  exercise: Exercise;
+}
+
+const { exercise } = Astro.props;
+
+// Exercices liés
+const relatedExercises = exercises
+  .filter(e => e.slug !== exercise.slug)
+  .filter(e => e.level === exercise.level || e.domain === exercise.domain)
+  .slice(0, 3);
+
+// Breadcrumb
+const breadcrumbItems = [
+  { label: exercise.level, href: `/${exercise.level.toLowerCase()}` },
+  { label: domainLabels[exercise.domain], href: `/${exercise.level.toLowerCase()}/${exercise.domain === 'fr' ? 'francais' : exercise.domain === 'math' ? 'maths' : exercise.domain}` },
+  { label: exercise.title }
+];
+---
+
+<BaseLayout 
+  title={exercise.seo.title} 
+  description={exercise.seo.description}
+>
+  <div class="exercise-page container container--narrow">
+    <Breadcrumb items={breadcrumbItems} />
+    
+    <article>
+      <ExerciseHeader exercise={exercise} />
+      
+      <ExerciseItems items={exercise.items} interactive={true} />
+      
+      <CorrectionToggle correction={exercise.correction} items={exercise.items} />
+      
+      <!-- Actions -->
+      <div class="exercise-actions no-print">
+        <button type="button" class="btn btn--secondary" onclick="window.print()">
+          🖨️ Imprimer
+        </button>
+        <a href={`/jeux/quiz?exercise=${exercise.slug}`} class="btn btn--primary">
+          🎮 Jouer au Quiz
+        </a>
+      </div>
+    </article>
+    
+    {relatedExercises.length > 0 && (
+      <section class="related-section">
+        <h2 class="related-title">🔗 Exercices similaires</h2>
+        <div class="related-grid">
+          {relatedExercises.map((ex) => (
+            <ExerciseCard exercise={ex} />
+          ))}
+        </div>
+      </section>
+    )}
+    
+    <!-- Internal Links for SEO -->
+    {exercise.seo.internalLinks.length > 0 && (
+      <nav class="internal-links" aria-label="Liens internes">
+        <h3>Voir aussi :</h3>
+        <ul>
+          {exercise.seo.internalLinks.map((link) => (
+            <li><a href={link}>{link}</a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
+  </div>
+
+  <!-- Schema.org -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": exercise.h1,
+    "description": exercise.seo.description,
+    "educationalLevel": exercise.level,
+    "learningResourceType": "Exercise",
+    "inLanguage": "fr",
+    "isAccessibleForFree": true,
+    "keywords": exercise.seo.tags.join(", ")
+  })} />
+</BaseLayout>
+
+<style>
+  .exercise-page {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+  }
+  
+  .exercise-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .related-section {
+    margin-top: 3rem;
+  }
+  
+  .related-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  
+  .internal-links {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: var(--radius-md);
+  }
+  
+  .internal-links h3 {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+  }
+  
+  .internal-links ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .internal-links a {
+    font-size: 0.9rem;
+  }
+</style>

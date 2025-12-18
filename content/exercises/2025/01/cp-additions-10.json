@@ -1,0 +1,35 @@
+{
+  "date": "2025-01-15",
+  "level": "CP",
+  "domain": "math",
+  "skill": "Calculer des additions simples",
+  "type": "calcul-mental",
+  "theme": "Hiver",
+  "title": "Additions jusqu'à 10",
+  "slug": "20250115-additions-jusqua-10-cp",
+  "h1": "Additions jusqu'à 10 - CP",
+  "instruction": "Trouve le résultat de chaque addition. Tu peux utiliser tes doigts pour compter !",
+  "items": [
+    { "q": "2 + 3 = ?", "a": "5" },
+    { "q": "4 + 1 = ?", "a": "5" },
+    { "q": "3 + 3 = ?", "a": "6" },
+    { "q": "5 + 2 = ?", "a": "7" },
+    { "q": "1 + 6 = ?", "a": "7" },
+    { "q": "4 + 4 = ?", "a": "8", "hint": "C'est le double de 4 !" },
+    { "q": "2 + 6 = ?", "a": "8" },
+    { "q": "3 + 5 = ?", "a": "8" },
+    { "q": "1 + 8 = ?", "a": "9" },
+    { "q": "5 + 5 = ?", "a": "10", "hint": "C'est le double de 5 !" }
+  ],
+  "correction": {
+    "mode": "list",
+    "v": ["5", "5", "6", "7", "7", "8", "8", "8", "9", "10"]
+  },
+  "seo": {
+    "title": "Exercices additions CP jusqu'à 10 - Calcul mental",
+    "description": "Exercices gratuits d'additions pour le CP. Calculs simples jusqu'à 10 avec correction. Parfait pour apprendre à compter en s'amusant.",
+    "tags": ["additions", "CP", "calcul mental", "maths", "nombres jusqu'à 10", "cycle 2"],
+    "internalLinks": ["/cp/maths", "/cp/maths/numeration"],
+    "nextSuggestions": ["20250116-soustractions-cp", "20250117-additions-20-cp"]
+  }
+}

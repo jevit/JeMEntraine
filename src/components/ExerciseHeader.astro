@@ -1,0 +1,89 @@
+---
+import type { Exercise } from '../types/exercise';
+import { domainEmojis, domainLabels, levelEmojis } from '../utils/helpers';
+
+interface Props {
+  exercise: Exercise;
+}
+
+const { exercise } = Astro.props;
+---
+
+<div class="exercise-header">
+  <span class="exercise-header__emoji">{domainEmojis[exercise.domain]}</span>
+  
+  <h1 class="exercise-header__title">{exercise.h1}</h1>
+  
+  <div class="exercise-header__badges">
+    <span class={`badge badge--${exercise.level.toLowerCase()}`}>
+      {levelEmojis[exercise.level]} {exercise.level}
+    </span>
+    <span class={`badge badge--${exercise.domain}`}>
+      {domainLabels[exercise.domain]}
+    </span>
+    {exercise.theme && (
+      <span class="badge badge--theme">
+        🎄 {exercise.theme}
+      </span>
+    )}
+  </div>
+  
+  <div class="exercise-header__instruction">
+    <span class="instruction-icon">💡</span>
+    <span>{exercise.instruction}</span>
+  </div>
+</div>
+
+<style>
+  .exercise-header {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .exercise-header__emoji {
+    display: block;
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+  
+  .exercise-header__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--color-primary-dark);
+    margin-bottom: 1rem;
+  }
+  
+  .exercise-header__badges {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .badge--theme {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .exercise-header__instruction {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, #fef3c7, #fce7f3);
+    border-radius: var(--radius-md);
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  
+  .instruction-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+</style>

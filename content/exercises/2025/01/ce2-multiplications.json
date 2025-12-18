@@ -1,0 +1,41 @@
+{
+  "date": "2025-01-15",
+  "level": "CE2",
+  "domain": "math",
+  "skill": "Connaître les tables de multiplication de 2 à 5",
+  "type": "calcul-mental",
+  "theme": "Hiver",
+  "title": "Tables de multiplication (2 à 5)",
+  "slug": "20250115-tables-multiplication-ce2",
+  "h1": "Tables de multiplication de 2 à 5 - CE2",
+  "instruction": "Trouve le résultat de chaque multiplication. Essaie de répondre vite !",
+  "items": [
+    { "q": "2 × 3 = ?", "a": "6" },
+    { "q": "3 × 4 = ?", "a": "12" },
+    { "q": "4 × 5 = ?", "a": "20" },
+    { "q": "5 × 3 = ?", "a": "15" },
+    { "q": "2 × 7 = ?", "a": "14" },
+    { "q": "3 × 6 = ?", "a": "18" },
+    { "q": "4 × 4 = ?", "a": "16", "hint": "C'est le carré de 4 !" },
+    { "q": "5 × 5 = ?", "a": "25", "hint": "C'est le carré de 5 !" },
+    { "q": "2 × 9 = ?", "a": "18" },
+    { "q": "3 × 8 = ?", "a": "24" },
+    { "q": "4 × 7 = ?", "a": "28" },
+    { "q": "5 × 6 = ?", "a": "30" },
+    { "q": "2 × 5 = ?", "a": "10" },
+    { "q": "3 × 9 = ?", "a": "27" },
+    { "q": "4 × 8 = ?", "a": "32" },
+    { "q": "5 × 7 = ?", "a": "35" }
+  ],
+  "correction": {
+    "mode": "list",
+    "v": ["6", "12", "20", "15", "14", "18", "16", "25", "18", "24", "28", "30", "10", "27", "32", "35"]
+  },
+  "seo": {
+    "title": "Exercices tables de multiplication CE2 - Tables 2 à 5",
+    "description": "Exercices gratuits sur les tables de multiplication de 2 à 5 pour le CE2. Calcul mental avec correction. Entraînement aux tables.",
+    "tags": ["multiplication", "CE2", "tables", "calcul mental", "maths", "cycle 2"],
+    "internalLinks": ["/ce2/maths", "/ce2/maths/calcul-mental"],
+    "nextSuggestions": ["20250116-tables-6-7-ce2", "20250117-divisions-ce2"]
+  }
+}

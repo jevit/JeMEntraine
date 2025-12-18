@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import MatchingGame from '../../components/MatchingGame.astro';
+import type { Exercise, Level } from '../../types/exercise';
+
+import cpEx from '../../../content/exercises/2025/01/cp-additions-10.json';
+import ce1Ex from '../../../content/exercises/2025/01/ce1-sons-on-an.json';
+import ce2Ex from '../../../content/exercises/2025/01/ce2-multiplications.json';
+
+const exercises: Exercise[] = [cpEx, ce1Ex, ce2Ex] as Exercise[];
+
+const url = new URL(Astro.request.url);
+const levelParam = url.searchParams.get('level') as Level | null;
+
+let selectedExercise: Exercise | undefined;
+if (levelParam) {
+  const levelExercises = exercises.filter(e => e.level === levelParam);
+  selectedExercise = levelExercises[Math.floor(Math.random() * levelExercises.length)];
+} else {
+  selectedExercise = exercises[Math.floor(Math.random() * exercises.length)];
+}
+
+const level = selectedExercise?.level || 'CP';
+---
+
+<BaseLayout 
+  title={`Relier ${level}`}
+  description={`Jeu de correspondance éducatif ${level}. Associe chaque question à sa réponse !`}
+>
+  <div class="matching-page container">
+    <Breadcrumb items={[
+      { label: 'Jeux', href: '/jeux' },
+      { label: 'Relier' }
+    ]} />
+    
+    <header class="matching-header">
+      <h1>Relier {level}</h1>
+      <p>Associe chaque question à sa réponse en cliquant dessus !</p>
+    </header>
+    
+    {selectedExercise ? (
+      <MatchingGame 
+        items={selectedExercise.items} 
+        level={selectedExercise.level}
+        title={selectedExercise.title}
+      />
+    ) : (
+      <div class="no-exercise">
+        <p>Aucun exercice disponible pour ce niveau.</p>
+        <a href="/jeux" class="btn btn--primary">Retour aux jeux</a>
+      </div>
+    )}
+    
+    <div class="game-actions">
+      <a href={`/jeux/relier?level=CP`} class="level-btn level-btn--cp">Relier CP</a>
+      <a href={`/jeux/relier?level=CE1`} class="level-btn level-btn--ce1">Relier CE1</a>
+      <a href={`/jeux/relier?level=CE2`} class="level-btn level-btn--ce2">Relier CE2</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .matching-page {
+    padding: 2rem 0 4rem;
+  }
+  
+  .matching-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .matching-header h1 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .matching-header p {
+    color: var(--color-text-muted);
+  }
+  
+  .no-exercise {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: var(--radius-lg);
+  }
+  
+  .game-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .level-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+  
+  .level-btn--cp { background: var(--color-cp-light); color: var(--color-cp-dark); }
+  .level-btn--ce1 { background: var(--color-ce1-light); color: var(--color-ce1-dark); }
+  .level-btn--ce2 { background: var(--color-ce2-light); color: var(--color-ce2-dark); }
+  
+  .level-btn:hover {
+    transform: scale(1.05);
+  }
+</style>

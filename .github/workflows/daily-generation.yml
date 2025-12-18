@@ -1,0 +1,77 @@
+name: Daily Exercise Generation
+
+on:
+  schedule:
+    # Tous les jours à 6h UTC (7h/8h France selon heure d'été)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Nombre d exercices à générer'
+        required: false
+        default: '3'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate exercises with AI
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-4o
+        run: |
+          COUNT=${{ github.event.inputs.count || '3' }}
+          npm run generate:ai -- --count $COUNT
+        
+      - name: Validate all exercises
+        run: npm run validate
+        
+      - name: Build site
+        run: npm run build
+        
+      - name: Commit new exercises
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add content/exercises/
+          
+          # Commit seulement si il y a des changements
+          if git diff --staged --quiet; then
+            echo "Pas de nouveaux exercices à commiter"
+          else
+            git commit -m "🤖 Auto-generate exercises $(date +%Y-%m-%d)"
+            git push
+          fi
+
+      # Décommenter pour déployer sur Cloudflare Pages
+      # - name: Deploy to Cloudflare Pages
+      #   uses: cloudflare/pages-action@v1
+      #   with:
+      #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      #     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      #     projectName: exocycle2
+      #     directory: dist
+
+      # Ou décommenter pour Vercel
+      # - name: Deploy to Vercel
+      #   uses: amondnet/vercel-action@v25
+      #   with:
+      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+      #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+      #     vercel-args: '--prod'

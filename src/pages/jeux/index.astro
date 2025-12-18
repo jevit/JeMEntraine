@@ -1,0 +1,242 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+---
+
+<BaseLayout 
+  title="Mini-Jeux Éducatifs" 
+  description="Jeux éducatifs gratuits pour apprendre en s'amusant : quiz, memory, relier. CP, CE1, CE2."
+>
+  <div class="games-page container">
+    <Breadcrumb items={[{ label: 'Jeux' }]} />
+    
+    <header class="games-header">
+      <span class="games-emoji">🎮</span>
+      <h1>Mini-Jeux Éducatifs</h1>
+      <p class="games-description">
+        Apprends en t'amusant avec nos jeux interactifs ! 
+        Choisis un jeu et sélectionne ton niveau.
+      </p>
+    </header>
+    
+    <div class="games-grid">
+      <div class="game-card">
+        <span class="game-card__emoji">❓</span>
+        <h2 class="game-card__title">Quiz Express</h2>
+        <p class="game-card__description">
+          10 questions, des réponses au choix, et un score à battre ! 
+          Teste tes connaissances en français et en maths.
+        </p>
+        <div class="game-card__levels">
+          <a href="/jeux/quiz?level=CP" class="level-btn level-btn--cp">CP</a>
+          <a href="/jeux/quiz?level=CE1" class="level-btn level-btn--ce1">CE1</a>
+          <a href="/jeux/quiz?level=CE2" class="level-btn level-btn--ce2">CE2</a>
+        </div>
+      </div>
+      
+      <div class="game-card">
+        <span class="game-card__emoji">🃏</span>
+        <h2 class="game-card__title">Memory</h2>
+        <p class="game-card__description">
+          Retourne les cartes et associe les questions à leurs réponses. 
+          Entraîne ta mémoire tout en révisant !
+        </p>
+        <div class="game-card__levels">
+          <a href="/jeux/memory?level=CP" class="level-btn level-btn--cp">CP</a>
+          <a href="/jeux/memory?level=CE1" class="level-btn level-btn--ce1">CE1</a>
+          <a href="/jeux/memory?level=CE2" class="level-btn level-btn--ce2">CE2</a>
+        </div>
+      </div>
+      
+      <div class="game-card">
+        <span class="game-card__emoji">🔗</span>
+        <h2 class="game-card__title">Relier</h2>
+        <p class="game-card__description">
+          Clique sur une question puis sur sa réponse pour les associer. 
+          Un classique efficace pour apprendre !
+        </p>
+        <div class="game-card__levels">
+          <a href="/jeux/relier?level=CP" class="level-btn level-btn--cp">CP</a>
+          <a href="/jeux/relier?level=CE1" class="level-btn level-btn--ce1">CE1</a>
+          <a href="/jeux/relier?level=CE2" class="level-btn level-btn--ce2">CE2</a>
+        </div>
+      </div>
+    </div>
+    
+    <section class="how-to-play">
+      <h2>🎯 Comment jouer ?</h2>
+      <div class="how-grid">
+        <div class="how-card">
+          <span class="how-number">1</span>
+          <h3>Choisis ton jeu</h3>
+          <p>Quiz, Memory ou Relier ? Chaque jeu a ses avantages !</p>
+        </div>
+        <div class="how-card">
+          <span class="how-number">2</span>
+          <h3>Sélectionne ton niveau</h3>
+          <p>CP, CE1 ou CE2 : les questions sont adaptées à chaque niveau.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-number">3</span>
+          <h3>Amuse-toi !</h3>
+          <p>Réponds aux questions et bats ton meilleur score !</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .games-page {
+    padding: 2rem 0 4rem;
+  }
+  
+  .games-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .games-emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  
+  .games-header h1 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .games-description {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .game-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: all var(--transition-slow);
+  }
+  
+  .game-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .game-card__emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  
+  .game-card__title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    margin-bottom: 0.75rem;
+  }
+  
+  .game-card__description {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  
+  .game-card__levels {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  .level-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+  
+  .level-btn--cp {
+    background: var(--color-cp-light);
+    color: var(--color-cp-dark);
+  }
+  
+  .level-btn--ce1 {
+    background: var(--color-ce1-light);
+    color: var(--color-ce1-dark);
+  }
+  
+  .level-btn--ce2 {
+    background: var(--color-ce2-light);
+    color: var(--color-ce2-dark);
+  }
+  
+  .level-btn:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .how-to-play {
+    background: linear-gradient(135deg, #fef3c7, #fce7f3);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+  }
+  
+  .how-to-play h2 {
+    font-family: var(--font-display);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .how-card {
+    text-align: center;
+  }
+  
+  .how-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .how-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .how-card p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+</style>

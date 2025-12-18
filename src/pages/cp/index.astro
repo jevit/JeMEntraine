@@ -1,0 +1,210 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import ExerciseCard from '../../components/ExerciseCard.astro';
+import type { Exercise } from '../../types/exercise';
+import { domainLabels, domainEmojis } from '../../utils/helpers';
+
+// Import des exercices
+import cpEx from '../../../content/exercises/2025/01/cp-additions-10.json';
+
+const exercises: Exercise[] = [cpEx] as Exercise[];
+const cpExercises = exercises.filter(e => e.level === 'CP');
+
+// Grouper par domaine
+const byDomain = cpExercises.reduce((acc, ex) => {
+  if (!acc[ex.domain]) acc[ex.domain] = [];
+  acc[ex.domain].push(ex);
+  return acc;
+}, {} as Record<string, Exercise[]>);
+---
+
+<BaseLayout 
+  title="Exercices CP" 
+  description="Exercices gratuits pour le CP : lecture, écriture, calcul, découverte du monde. Fiches à imprimer et jeux en ligne."
+>
+  <div class="level-page container">
+    <Breadcrumb items={[{ label: 'CP' }]} />
+    
+    <header class="level-header">
+      <span class="level-emoji">🐣</span>
+      <h1>Exercices CP</h1>
+      <p class="level-description">
+        Bienvenue au CP ! Découvre des exercices amusants pour apprendre à lire, écrire et compter.
+      </p>
+    </header>
+    
+    <FilterBar currentLevel="CP" showLevels={false} />
+    
+    <!-- Par matière -->
+    <nav class="domain-nav">
+      <a href="/cp/francais" class="domain-link" data-domain="fr">
+        <span>{domainEmojis.fr}</span>
+        <span>Français</span>
+      </a>
+      <a href="/cp/maths" class="domain-link" data-domain="math">
+        <span>{domainEmojis.math}</span>
+        <span>Maths</span>
+      </a>
+      <a href="/cp/qlm" class="domain-link" data-domain="qlm">
+        <span>{domainEmojis.qlm}</span>
+        <span>QLM</span>
+      </a>
+      <a href="/cp/emc" class="domain-link" data-domain="emc">
+        <span>{domainEmojis.emc}</span>
+        <span>EMC</span>
+      </a>
+    </nav>
+    
+    <!-- Liste des exercices -->
+    <section class="exercises-section">
+      <h2 class="section-title">📝 Tous les exercices CP</h2>
+      
+      {cpExercises.length > 0 ? (
+        <div class="exercise-grid">
+          {cpExercises.map((exercise) => (
+            <ExerciseCard exercise={exercise} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty-state">Les exercices arrivent bientôt ! 🚀</p>
+      )}
+    </section>
+    
+    <!-- SEO Hub Links -->
+    <section class="hub-links">
+      <h2>Fiches CP par thème</h2>
+      <div class="hub-grid">
+        <a href="/cp/francais/lecture" class="hub-link">Lecture CP</a>
+        <a href="/cp/francais/ecriture" class="hub-link">Écriture CP</a>
+        <a href="/cp/francais/phonologie" class="hub-link">Sons et syllabes CP</a>
+        <a href="/cp/maths/calcul-mental" class="hub-link">Calcul mental CP</a>
+        <a href="/cp/maths/numeration" class="hub-link">Numération CP</a>
+        <a href="/cp/maths/problemes" class="hub-link">Problèmes CP</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .level-page {
+    padding: 2rem 0 4rem;
+  }
+  
+  .level-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .level-emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  
+  .level-header h1 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--color-cp);
+    margin-bottom: 0.5rem;
+  }
+  
+  .level-description {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .domain-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+  
+  .domain-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 600;
+    transition: all var(--transition-base);
+  }
+  
+  .domain-link:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .domain-link[data-domain="fr"]:hover { color: var(--color-francais); }
+  .domain-link[data-domain="math"]:hover { color: var(--color-maths); }
+  .domain-link[data-domain="qlm"]:hover { color: var(--color-qlm); }
+  .domain-link[data-domain="emc"]:hover { color: var(--color-emc); }
+  
+  .exercises-section {
+    margin-top: 2rem;
+  }
+  
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+  }
+  
+  .hub-links {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .hub-links h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .hub-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .hub-link {
+    padding: 0.5rem 1rem;
+    background: #f1f5f9;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--color-text-muted);
+    transition: all var(--transition-fast);
+  }
+  
+  .hub-link:hover {
+    background: var(--color-cp-light);
+    color: var(--color-cp-dark);
+  }
+</style>

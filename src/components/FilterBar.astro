@@ -1,0 +1,200 @@
+---
+import type { Level, Domain } from '../types/exercise';
+import { domainLabels, domainEmojis } from '../utils/helpers';
+
+interface Props {
+  currentLevel?: Level;
+  currentDomain?: Domain;
+  showLevels?: boolean;
+  showDomains?: boolean;
+}
+
+const { 
+  currentLevel, 
+  currentDomain, 
+  showLevels = true, 
+  showDomains = true 
+} = Astro.props;
+
+const levels: Level[] = ['CP', 'CE1', 'CE2'];
+const domains: Domain[] = ['fr', 'math', 'qlm', 'emc', 'lv'];
+---
+
+<div class="filter-bar">
+  {showLevels && (
+    <div class="filter-group">
+      <span class="filter-label">Niveau :</span>
+      <div class="filter-chips">
+        {levels.map((level) => (
+          <button 
+            type="button"
+            class:list={[
+              'filter-chip',
+              `filter-chip--${level.toLowerCase()}`,
+              { active: currentLevel === level }
+            ]}
+            data-level={level}
+          >
+            {level}
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+  
+  {showDomains && (
+    <div class="filter-group">
+      <span class="filter-label">Matière :</span>
+      <div class="filter-chips">
+        {domains.map((domain) => (
+          <button 
+            type="button"
+            class:list={[
+              'filter-chip',
+              `filter-chip--${domain}`,
+              { active: currentDomain === domain }
+            ]}
+            data-domain={domain}
+          >
+            {domainEmojis[domain]} {domainLabels[domain]}
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
+<script>
+  const filterChips = document.querySelectorAll('.filter-chip');
+  
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const level = chip.getAttribute('data-level');
+      const domain = chip.getAttribute('data-domain');
+      
+      // Construire l'URL de filtre
+      const url = new URL(window.location.href);
+      
+      if (level) {
+        url.searchParams.set('level', level);
+      }
+      if (domain) {
+        url.searchParams.set('domain', domain);
+      }
+      
+      // Ou navigation directe vers la page filtrée
+      if (level) {
+        window.location.href = `/${level.toLowerCase()}`;
+      } else if (domain) {
+        const currentPath = window.location.pathname;
+        const levelMatch = currentPath.match(/\/(cp|ce1|ce2)/);
+        if (levelMatch) {
+          window.location.href = `/${levelMatch[1]}/${domain === 'fr' ? 'francais' : domain === 'math' ? 'maths' : domain}`;
+        }
+      }
+    });
+  });
+</script>
+
+<style>
+  .filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .filter-label {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    min-width: 70px;
+  }
+  
+  .filter-chips {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .filter-chip {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    border: 2px solid #e2e8f0;
+    background: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .filter-chip:hover {
+    border-color: var(--color-primary);
+  }
+  
+  .filter-chip.active {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+  }
+  
+  /* Couleurs par niveau */
+  .filter-chip--cp.active {
+    background: var(--color-cp);
+    border-color: var(--color-cp);
+  }
+  
+  .filter-chip--ce1.active {
+    background: var(--color-ce1);
+    border-color: var(--color-ce1);
+  }
+  
+  .filter-chip--ce2.active {
+    background: var(--color-ce2);
+    border-color: var(--color-ce2);
+  }
+  
+  /* Couleurs par domaine */
+  .filter-chip--fr.active {
+    background: var(--color-francais);
+    border-color: var(--color-francais);
+  }
+  
+  .filter-chip--math.active {
+    background: var(--color-maths);
+    border-color: var(--color-maths);
+  }
+  
+  .filter-chip--qlm.active {
+    background: var(--color-qlm);
+    border-color: var(--color-qlm);
+  }
+  
+  .filter-chip--emc.active {
+    background: var(--color-emc);
+    border-color: var(--color-emc);
+  }
+  
+  .filter-chip--lv.active {
+    background: var(--color-lv);
+    border-color: var(--color-lv);
+  }
+  
+  @media (max-width: 640px) {
+    .filter-group {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

@@ -1,0 +1,153 @@
+---
+import type { Correction, ExerciseItem } from '../types/exercise';
+
+interface Props {
+  correction: Correction;
+  items: ExerciseItem[];
+}
+
+const { correction, items } = Astro.props;
+---
+
+<div class="correction-section">
+  <button 
+    type="button"
+    class="correction-toggle"
+    aria-expanded="false"
+    aria-controls="correction-content"
+  >
+    <span>✅ Voir la correction</span>
+    <span class="correction-toggle__icon">▼</span>
+  </button>
+  
+  <div id="correction-content" class="correction-content" hidden>
+    {correction.mode === 'list' ? (
+      <ul class="correction-list">
+        {items.map((item, index) => (
+          <li class="correction-item">
+            <span class="correction-number">{index + 1}.</span>
+            <span class="correction-question">{item.q}</span>
+            <span class="correction-answer">{correction.v[index]}</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="correction-text">
+        <p>{correction.v}</p>
+      </div>
+    )}
+  </div>
+</div>
+
+<script>
+  const toggleBtn = document.querySelector('.correction-toggle');
+  const content = document.getElementById('correction-content');
+  
+  if (toggleBtn && content) {
+    toggleBtn.addEventListener('click', () => {
+      const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+      toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+      toggleBtn.classList.toggle('open');
+      content.hidden = isExpanded;
+    });
+  }
+</script>
+
+<style>
+  .correction-section {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+  
+  .correction-toggle {
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-success), #16a34a);
+    color: white;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all var(--transition-base);
+  }
+  
+  .correction-toggle:hover {
+    filter: brightness(1.1);
+  }
+  
+  .correction-toggle__icon {
+    transition: transform var(--transition-slow);
+  }
+  
+  .correction-toggle.open .correction-toggle__icon {
+    transform: rotate(180deg);
+  }
+  
+  .correction-content {
+    padding: 1.5rem;
+    animation: slideDown var(--transition-slow) ease;
+  }
+  
+  .correction-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .correction-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: #f0fdf4;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--color-success);
+  }
+  
+  .correction-number {
+    font-weight: 700;
+    color: var(--color-success);
+    min-width: 1.5rem;
+  }
+  
+  .correction-question {
+    flex: 1;
+    color: var(--color-text-muted);
+  }
+  
+  .correction-answer {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  
+  .correction-text {
+    padding: 1rem;
+    background: #f0fdf4;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--color-success);
+  }
+  
+  .correction-text p {
+    margin: 0;
+    line-height: 1.7;
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

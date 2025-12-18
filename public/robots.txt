@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://exocycle2.fr/sitemap-index.xml

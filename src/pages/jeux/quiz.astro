@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import QuizGame from '../../components/QuizGame.astro';
+import type { Exercise, Level } from '../../types/exercise';
+
+// Import des exercices
+import cpEx from '../../../content/exercises/2025/01/cp-additions-10.json';
+import ce1Ex from '../../../content/exercises/2025/01/ce1-sons-on-an.json';
+import ce2Ex from '../../../content/exercises/2025/01/ce2-multiplications.json';
+
+const exercises: Exercise[] = [cpEx, ce1Ex, ce2Ex] as Exercise[];
+
+// Récupérer les paramètres
+const url = new URL(Astro.request.url);
+const levelParam = url.searchParams.get('level') as Level | null;
+const exerciseSlug = url.searchParams.get('exercise');
+
+// Sélectionner l'exercice
+let selectedExercise: Exercise | undefined;
+
+if (exerciseSlug) {
+  selectedExercise = exercises.find(e => e.slug === exerciseSlug);
+} else if (levelParam) {
+  const levelExercises = exercises.filter(e => e.level === levelParam);
+  selectedExercise = levelExercises[Math.floor(Math.random() * levelExercises.length)];
+} else {
+  selectedExercise = exercises[Math.floor(Math.random() * exercises.length)];
+}
+
+const level = selectedExercise?.level || 'CP';
+const title = selectedExercise?.title || 'Quiz';
+---
+
+<BaseLayout 
+  title={`Quiz ${level} - ${title}`}
+  description={`Quiz interactif ${level} : ${title}. Teste tes connaissances en t'amusant !`}
+>
+  <div class="quiz-page container">
+    <Breadcrumb items={[
+      { label: 'Jeux', href: '/jeux' },
+      { label: 'Quiz' }
+    ]} />
+    
+    <header class="quiz-header">
+      <h1>Quiz {level}</h1>
+      <p>Réponds aux questions et obtiens le meilleur score !</p>
+    </header>
+    
+    {selectedExercise ? (
+      <QuizGame 
+        items={selectedExercise.items} 
+        level={selectedExercise.level}
+        title={selectedExercise.title}
+      />
+    ) : (
+      <div class="no-exercise">
+        <p>Aucun exercice disponible pour ce niveau.</p>
+        <a href="/jeux" class="btn btn--primary">Retour aux jeux</a>
+      </div>
+    )}
+    
+    <div class="quiz-actions">
+      <a href={`/jeux/quiz?level=CP`} class="level-btn level-btn--cp">Quiz CP</a>
+      <a href={`/jeux/quiz?level=CE1`} class="level-btn level-btn--ce1">Quiz CE1</a>
+      <a href={`/jeux/quiz?level=CE2`} class="level-btn level-btn--ce2">Quiz CE2</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .quiz-page {
+    padding: 2rem 0 4rem;
+    max-width: 700px;
+  }
+  
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .quiz-header h1 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .quiz-header p {
+    color: var(--color-text-muted);
+  }
+  
+  .no-exercise {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .quiz-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .level-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+  
+  .level-btn--cp {
+    background: var(--color-cp-light);
+    color: var(--color-cp-dark);
+  }
+  
+  .level-btn--ce1 {
+    background: var(--color-ce1-light);
+    color: var(--color-ce1-dark);
+  }
+  
+  .level-btn--ce2 {
+    background: var(--color-ce2-light);
+    color: var(--color-ce2-dark);
+  }
+  
+  .level-btn:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-sm);
+  }
+</style>

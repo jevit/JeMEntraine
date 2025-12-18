@@ -1,0 +1,81 @@
+---
+import type { Level } from '../types/exercise';
+import { levelEmojis, levelColors } from '../utils/helpers';
+
+interface Props {
+  level: Level;
+  count: number;
+  description: string;
+}
+
+const { level, count, description } = Astro.props;
+
+const levelDescriptions: Record<Level, string> = {
+  CP: 'Premiers pas en lecture et calcul',
+  CE1: 'On approfondit et on s\'amuse',
+  CE2: 'Prêt pour les défis !'
+};
+---
+
+<a href={`/${level.toLowerCase()}`} class="level-card" data-level={level.toLowerCase()}>
+  <span class="level-card__emoji">{levelEmojis[level]}</span>
+  <h2 class="level-card__title">{level}</h2>
+  <p class="level-card__description">{description || levelDescriptions[level]}</p>
+  <span class="level-card__count">{count} exercices</span>
+</a>
+
+<style>
+  .level-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    color: inherit;
+    text-align: center;
+    border: 3px solid transparent;
+    transition: all var(--transition-slow);
+  }
+  
+  .level-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .level-card[data-level="cp"] { border-color: var(--color-cp); }
+  .level-card[data-level="ce1"] { border-color: var(--color-ce1); }
+  .level-card[data-level="ce2"] { border-color: var(--color-ce2); }
+  
+  .level-card__emoji {
+    font-size: 3.5rem;
+  }
+  
+  .level-card__title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    margin: 0;
+  }
+  
+  .level-card[data-level="cp"] .level-card__title { color: var(--color-cp); }
+  .level-card[data-level="ce1"] .level-card__title { color: var(--color-ce1); }
+  .level-card[data-level="ce2"] .level-card__title { color: var(--color-ce2); }
+  
+  .level-card__description {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  
+  .level-card__count {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #f1f5f9;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+</style>

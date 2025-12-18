@@ -1,0 +1,365 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LevelCard from '../components/LevelCard.astro';
+import ExerciseCard from '../components/ExerciseCard.astro';
+import type { Exercise, Level } from '../types/exercise';
+
+// Import des exercices statiques (en production, utiliser le loader)
+import cpEx from '../../content/exercises/2025/01/cp-additions-10.json';
+import ce1Ex from '../../content/exercises/2025/01/ce1-sons-on-an.json';
+import ce2Ex from '../../content/exercises/2025/01/ce2-multiplications.json';
+
+const exercises: Exercise[] = [cpEx, ce1Ex, ce2Ex] as Exercise[];
+const recentExercises = exercises.slice(0, 6);
+
+const levelCounts: Record<Level, number> = {
+  CP: exercises.filter(e => e.level === 'CP').length * 40,
+  CE1: exercises.filter(e => e.level === 'CE1').length * 50,
+  CE2: exercises.filter(e => e.level === 'CE2').length * 60
+};
+---
+
+<BaseLayout title="Accueil">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero__content">
+      <span class="hero__emoji">🎒</span>
+      <h1 class="hero__title">Apprends en t'amusant !</h1>
+      <p class="hero__subtitle">
+        Des exercices et des jeux pour progresser en CP, CE1 et CE2. 
+        Choisis ton niveau et c'est parti ! 🚀
+      </p>
+      
+      <div class="search-box">
+        <form action="/recherche" method="GET" class="search-form">
+          <input 
+            type="search" 
+            name="q" 
+            class="search-input" 
+            placeholder="Cherche un exercice..."
+            aria-label="Rechercher un exercice"
+          />
+          <button type="submit" class="btn btn--primary">
+            🔍 Chercher
+          </button>
+        </form>
+        
+        <div class="filter-chips">
+          <a href="/cp/francais" class="filter-chip" data-domain="fr">📖 Français</a>
+          <a href="/cp/maths" class="filter-chip" data-domain="math">🧮 Maths</a>
+          <a href="/cp/qlm" class="filter-chip" data-domain="qlm">🌍 QLM</a>
+          <a href="/cp/emc" class="filter-chip" data-domain="emc">🤝 EMC</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Niveaux -->
+  <section class="section container">
+    <h2 class="section__title">
+      <span>📚</span> Choisis ton niveau
+    </h2>
+    
+    <div class="level-cards">
+      <LevelCard level="CP" count={levelCounts.CP} description="Premiers pas en lecture et calcul" />
+      <LevelCard level="CE1" count={levelCounts.CE1} description="On approfondit et on s'amuse" />
+      <LevelCard level="CE2" count={levelCounts.CE2} description="Prêt pour les défis !" />
+    </div>
+  </section>
+
+  <!-- Exercices récents -->
+  <section class="section container">
+    <div class="section__header">
+      <h2 class="section__title">
+        <span>✨</span> Exercices récents
+      </h2>
+      <a href="/exercices" class="see-all-link">Voir tout →</a>
+    </div>
+    
+    <div class="exercise-grid">
+      {recentExercises.map((exercise) => (
+        <ExerciseCard exercise={exercise} />
+      ))}
+    </div>
+  </section>
+
+  <!-- Mini-jeux -->
+  <section class="section section--alt">
+    <div class="container">
+      <h2 class="section__title">
+        <span>🎮</span> Mini-jeux éducatifs
+      </h2>
+      
+      <div class="games-grid">
+        <a href="/jeux/quiz" class="game-card">
+          <span class="game-card__emoji">❓</span>
+          <h3 class="game-card__title">Quiz Express</h3>
+          <p class="game-card__description">10 questions, un chrono, et c'est parti !</p>
+          <span class="btn btn--primary">Jouer !</span>
+        </a>
+        
+        <a href="/jeux/memory" class="game-card">
+          <span class="game-card__emoji">🃏</span>
+          <h3 class="game-card__title">Memory</h3>
+          <p class="game-card__description">Retourne les cartes et trouve les paires !</p>
+          <span class="btn btn--primary">Jouer !</span>
+        </a>
+        
+        <a href="/jeux/relier" class="game-card">
+          <span class="game-card__emoji">🔗</span>
+          <h3 class="game-card__title">Relier</h3>
+          <p class="game-card__description">Associe chaque question à sa réponse.</p>
+          <span class="btn btn--primary">Jouer !</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEO Links -->
+  <section class="section container">
+    <h2 class="section__title">
+      <span>📖</span> Explorer par matière
+    </h2>
+    
+    <div class="seo-links">
+      <div class="seo-group">
+        <h3>CP</h3>
+        <ul>
+          <li><a href="/cp/francais">Exercices CP Français</a></li>
+          <li><a href="/cp/maths">Exercices CP Maths</a></li>
+          <li><a href="/cp/qlm">Exercices CP QLM</a></li>
+        </ul>
+      </div>
+      <div class="seo-group">
+        <h3>CE1</h3>
+        <ul>
+          <li><a href="/ce1/francais">Exercices CE1 Français</a></li>
+          <li><a href="/ce1/maths">Exercices CE1 Maths</a></li>
+          <li><a href="/ce1/qlm">Exercices CE1 QLM</a></li>
+        </ul>
+      </div>
+      <div class="seo-group">
+        <h3>CE2</h3>
+        <ul>
+          <li><a href="/ce2/francais">Exercices CE2 Français</a></li>
+          <li><a href="/ce2/maths">Exercices CE2 Maths</a></li>
+          <li><a href="/ce2/qlm">Exercices CE2 QLM</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #dbeafe 100%);
+    padding: 4rem 1.5rem;
+    text-align: center;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  }
+  
+  .hero__emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: bounce 2s ease infinite;
+  }
+  
+  .hero__title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--color-primary-dark);
+    margin-bottom: 1rem;
+  }
+  
+  .hero__subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto 2rem;
+  }
+  
+  .search-box {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .search-form {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 1rem 1.25rem;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    font-size: 1.1rem;
+    font-family: inherit;
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+  
+  .filter-chips {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .filter-chip {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    border: 2px solid #e2e8f0;
+    background: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: inherit;
+    transition: all var(--transition-fast);
+  }
+  
+  .filter-chip:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+  }
+  
+  /* Sections */
+  .section {
+    padding: 3rem 0;
+  }
+  
+  .section--alt {
+    background: white;
+    padding: 3rem 0;
+    margin: 2rem 0;
+  }
+  
+  .section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .section__title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .section__header .section__title {
+    margin-bottom: 0;
+  }
+  
+  .see-all-link {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  
+  /* Level Cards Grid */
+  .level-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  /* Exercise Grid */
+  .exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  /* Games Grid */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .game-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    color: inherit;
+    text-align: center;
+    transition: all var(--transition-slow);
+  }
+  
+  .game-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .game-card__emoji {
+    font-size: 4rem;
+  }
+  
+  .game-card__title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin: 0;
+  }
+  
+  .game-card__description {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  
+  /* SEO Links */
+  .seo-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+  
+  .seo-group h3 {
+    font-family: var(--font-display);
+    color: var(--color-primary);
+    margin-bottom: 0.75rem;
+  }
+  
+  .seo-group ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .seo-group a {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+  
+  .seo-group a:hover {
+    color: var(--color-primary);
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+</style>

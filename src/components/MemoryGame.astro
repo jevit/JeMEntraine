@@ -1,0 +1,278 @@
+---
+import type { ExerciseItem, Level } from '../types/exercise';
+
+interface Props {
+  items: ExerciseItem[];
+  level: Level;
+  title: string;
+}
+
+const { items, level, title } = Astro.props;
+const memoryId = `memory-${Math.random().toString(36).slice(2, 9)}`;
+const pairCount = level === 'CP' ? 4 : level === 'CE1' ? 6 : 8;
+---
+
+<div class="memory-game" id={memoryId}>
+  <div class="memory-header">
+    <h2 class="memory-title">🃏 {title}</h2>
+    <div class="memory-stats">
+      <span class="memory-pairs">⭐ Paires : <strong>0</strong> / <span class="total-pairs">{pairCount}</span></span>
+      <span class="memory-moves">🔄 Coups : <strong>0</strong></span>
+    </div>
+  </div>
+  
+  <div class="memory-grid"></div>
+  
+  <div class="memory-win" hidden>
+    <span class="win-emoji">🎉</span>
+    <p class="win-text">Bravo !</p>
+    <p class="win-stats"></p>
+    <button type="button" class="btn btn--primary btn--lg replay-btn">🔄 Rejouer</button>
+  </div>
+</div>
+
+<script define:vars={{ items, memoryId, pairCount }}>
+  const container = document.getElementById(memoryId);
+  if (!container) throw new Error('Memory container not found');
+
+  let cards = [];
+  let flippedCards = [];
+  let matchedPairs = 0;
+  let moves = 0;
+  let isLocked = false;
+
+  const grid = container.querySelector('.memory-grid');
+  const pairsDisplay = container.querySelector('.memory-pairs strong');
+  const movesDisplay = container.querySelector('.memory-moves strong');
+  const winEl = container.querySelector('.memory-win');
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function initGame() {
+    matchedPairs = 0;
+    moves = 0;
+    flippedCards = [];
+    isLocked = false;
+    
+    pairsDisplay.textContent = '0';
+    movesDisplay.textContent = '0';
+    winEl.hidden = true;
+    
+    const selectedItems = shuffle(items).slice(0, pairCount);
+    
+    cards = [];
+    selectedItems.forEach((item, idx) => {
+      cards.push({ id: `q-${idx}`, pairId: idx, content: item.q, type: 'question' });
+      cards.push({ id: `a-${idx}`, pairId: idx, content: item.a, type: 'answer' });
+    });
+    
+    cards = shuffle(cards);
+    renderGrid();
+  }
+
+  function renderGrid() {
+    grid.innerHTML = cards.map(card => `
+      <button class="memory-card" data-id="${card.id}" data-pair="${card.pairId}">
+        <span class="card-back">?</span>
+        <span class="card-front">${card.content}</span>
+      </button>
+    `).join('');
+    
+    grid.querySelectorAll('.memory-card').forEach(card => {
+      card.addEventListener('click', () => flipCard(card));
+    });
+  }
+
+  function flipCard(cardEl) {
+    if (isLocked) return;
+    if (cardEl.classList.contains('flipped')) return;
+    if (cardEl.classList.contains('matched')) return;
+    if (flippedCards.length >= 2) return;
+    
+    cardEl.classList.add('flipped');
+    flippedCards.push(cardEl);
+    
+    if (flippedCards.length === 2) {
+      moves++;
+      movesDisplay.textContent = String(moves);
+      checkMatch();
+    }
+  }
+
+  function checkMatch() {
+    isLocked = true;
+    const [card1, card2] = flippedCards;
+    const pair1 = card1.dataset.pair;
+    const pair2 = card2.dataset.pair;
+    
+    if (pair1 === pair2) {
+      card1.classList.add('matched');
+      card2.classList.add('matched');
+      matchedPairs++;
+      pairsDisplay.textContent = String(matchedPairs);
+      
+      flippedCards = [];
+      isLocked = false;
+      
+      if (matchedPairs === pairCount) {
+        setTimeout(showWin, 500);
+      }
+    } else {
+      setTimeout(() => {
+        card1.classList.remove('flipped');
+        card2.classList.remove('flipped');
+        flippedCards = [];
+        isLocked = false;
+      }, 1000);
+    }
+  }
+
+  function showWin() {
+    winEl.hidden = false;
+    winEl.querySelector('.win-stats').textContent = `Tu as trouvé toutes les paires en ${moves} coups !`;
+  }
+
+  container.querySelector('.replay-btn')?.addEventListener('click', initGame);
+  
+  initGame();
+</script>
+
+<style>
+  .memory-game {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .memory-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .memory-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  
+  .memory-stats {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.95rem;
+  }
+  
+  .memory-stats strong {
+    color: var(--color-primary);
+  }
+  
+  .memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .memory-card {
+    aspect-ratio: 1;
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease;
+    font-family: inherit;
+  }
+  
+  .memory-card:hover:not(.flipped):not(.matched) {
+    transform: scale(1.05);
+  }
+  
+  .memory-card.flipped,
+  .memory-card.matched {
+    transform: rotateY(180deg);
+  }
+  
+  .memory-card.matched {
+    background: var(--color-success);
+  }
+  
+  .card-back,
+  .card-front {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    backface-visibility: hidden;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    text-align: center;
+    word-break: break-word;
+  }
+  
+  .card-back {
+    background: var(--color-primary);
+    color: white;
+    font-size: 2rem;
+  }
+  
+  .card-front {
+    background: white;
+    color: var(--color-text);
+    transform: rotateY(180deg);
+    border: 3px solid var(--color-primary);
+  }
+  
+  .memory-card.matched .card-front {
+    border-color: var(--color-success);
+    background: #dcfce7;
+  }
+  
+  .memory-win {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, #fef3c7, #d9f99d);
+    border-radius: var(--radius-lg);
+  }
+  
+  .memory-win .win-emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .memory-win .win-text {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--color-success);
+    margin: 0 0 0.5rem;
+  }
+  
+  .memory-win .win-stats {
+    color: var(--color-text-muted);
+    margin: 0 0 1.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    .memory-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

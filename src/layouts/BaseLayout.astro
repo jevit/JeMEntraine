@@ -1,0 +1,285 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  noIndex?: boolean;
+}
+
+const { 
+  title, 
+  description = "Exercices et jeux éducatifs gratuits pour le Cycle 2 : CP, CE1, CE2. Français, Maths, QLM, EMC.",
+  ogImage = "/og-default.png",
+  noIndex = false
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const fullTitle = title === "Accueil" ? "ExoCycle2 - Exercices Cycle 2" : `${title} | ExoCycle2`;
+---
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  
+  <title>{fullTitle}</title>
+  
+  <link rel="canonical" href={canonicalURL} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  
+  <!-- Preconnect pour les fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={new URL(ogImage, Astro.site)} />
+  <meta property="og:locale" content="fr_FR" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
+  
+  {noIndex && <meta name="robots" content="noindex, nofollow" />}
+  
+  <!-- Schema.org -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ExoCycle2",
+    "url": Astro.site,
+    "description": description,
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": `${Astro.site}recherche?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  })} />
+</head>
+<body>
+  <a href="#main-content" class="sr-only">Aller au contenu principal</a>
+  
+  <slot name="header">
+    <header class="header no-print">
+      <nav class="nav">
+        <div class="nav__container container">
+          <a href="/" class="nav__logo">
+            <span class="nav__logo-icon">📚</span>
+            <span class="nav__logo-text">ExoCycle2</span>
+          </a>
+          
+          <ul class="nav__links">
+            <li><a href="/cp" class="nav__link nav__link--cp">CP</a></li>
+            <li><a href="/ce1" class="nav__link nav__link--ce1">CE1</a></li>
+            <li><a href="/ce2" class="nav__link nav__link--ce2">CE2</a></li>
+            <li><a href="/jeux" class="nav__link nav__link--games">🎮 Jeux</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+  </slot>
+  
+  <main id="main-content">
+    <slot />
+  </main>
+  
+  <slot name="footer">
+    <footer class="footer no-print">
+      <div class="footer__container container">
+        <div class="footer__grid">
+          <div class="footer__section">
+            <h4 class="footer__title">📚 ExoCycle2</h4>
+            <p class="footer__text">
+              Des exercices gratuits pour apprendre en s'amusant, du CP au CE2.
+            </p>
+          </div>
+          
+          <div class="footer__section">
+            <h4 class="footer__title">Niveaux</h4>
+            <ul class="footer__links">
+              <li><a href="/cp">Exercices CP</a></li>
+              <li><a href="/ce1">Exercices CE1</a></li>
+              <li><a href="/ce2">Exercices CE2</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer__section">
+            <h4 class="footer__title">Matières</h4>
+            <ul class="footer__links">
+              <li><a href="/cp/francais">Français</a></li>
+              <li><a href="/cp/maths">Mathématiques</a></li>
+              <li><a href="/cp/qlm">Questionner le monde</a></li>
+              <li><a href="/cp/emc">EMC</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer__section">
+            <h4 class="footer__title">Mini-Jeux</h4>
+            <ul class="footer__links">
+              <li><a href="/jeux/quiz">Quiz</a></li>
+              <li><a href="/jeux/memory">Memory</a></li>
+              <li><a href="/jeux/relier">Relier</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="footer__bottom">
+          <p>© {new Date().getFullYear()} ExoCycle2 — Fait avec ❤️ pour les enfants</p>
+        </div>
+      </div>
+    </footer>
+  </slot>
+</body>
+</html>
+
+<style>
+  /* Navigation */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .nav__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .nav__logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  
+  .nav__logo-icon {
+    font-size: 2rem;
+  }
+  
+  .nav__links {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+  }
+  
+  .nav__link {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+  
+  .nav__link--cp {
+    color: var(--color-cp-dark);
+    background: var(--color-cp-light);
+  }
+  
+  .nav__link--ce1 {
+    color: var(--color-ce1-dark);
+    background: var(--color-ce1-light);
+  }
+  
+  .nav__link--ce2 {
+    color: var(--color-ce2-dark);
+    background: var(--color-ce2-light);
+  }
+  
+  .nav__link--games {
+    color: var(--color-primary);
+    background: #e0e7ff;
+  }
+  
+  .nav__link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  /* Footer */
+  .footer {
+    background: white;
+    padding: 3rem 0 2rem;
+    margin-top: 4rem;
+    border-top: 4px solid var(--color-primary-light);
+  }
+  
+  .footer__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+  
+  .footer__title {
+    font-family: var(--font-display);
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+  
+  .footer__text {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+  
+  .footer__links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .footer__links a {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+  
+  .footer__links a:hover {
+    color: var(--color-primary);
+  }
+  
+  .footer__bottom {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .nav__container {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .nav__links {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+</style>

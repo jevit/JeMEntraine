@@ -1,0 +1,92 @@
+---
+import type { Exercise } from '../types/exercise';
+import { domainEmojis, domainLabels, estimateTime } from '../utils/helpers';
+
+interface Props {
+  exercise: Exercise;
+}
+
+const { exercise } = Astro.props;
+const timeEstimate = estimateTime(exercise.items.length, exercise.level);
+---
+
+<a href={`/exercices/${exercise.slug}`} class="exercise-card" data-domain={exercise.domain}>
+  <div class="exercise-card__header">
+    <span class="exercise-card__emoji">{domainEmojis[exercise.domain]}</span>
+    <div class="exercise-card__badges">
+      <span class={`badge badge--${exercise.level.toLowerCase()}`}>{exercise.level}</span>
+      <span class={`badge badge--${exercise.domain}`}>{domainLabels[exercise.domain]}</span>
+    </div>
+  </div>
+  
+  <h3 class="exercise-card__title">{exercise.title}</h3>
+  
+  <div class="exercise-card__meta">
+    <span>📝 {exercise.items.length} questions</span>
+    <span>⏱️ {timeEstimate} min</span>
+  </div>
+</a>
+
+<style>
+  .exercise-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    border-left: 4px solid;
+    transition: all var(--transition-base);
+  }
+  
+  .exercise-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+  }
+  
+  .exercise-card[data-domain="fr"] { border-left-color: var(--color-francais); }
+  .exercise-card[data-domain="math"] { border-left-color: var(--color-maths); }
+  .exercise-card[data-domain="qlm"] { border-left-color: var(--color-qlm); }
+  .exercise-card[data-domain="emc"] { border-left-color: var(--color-emc); }
+  .exercise-card[data-domain="lv"] { border-left-color: var(--color-lv); }
+  
+  .exercise-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .exercise-card__emoji {
+    font-size: 1.75rem;
+  }
+  
+  .exercise-card__badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .exercise-card__title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.3;
+    margin: 0;
+  }
+  
+  .exercise-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  
+  .exercise-card__meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+</style>

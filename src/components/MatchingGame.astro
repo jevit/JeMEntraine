@@ -1,0 +1,334 @@
+---
+import type { ExerciseItem, Level } from '../types/exercise';
+
+interface Props {
+  items: ExerciseItem[];
+  level: Level;
+  title: string;
+}
+
+const { items, level, title } = Astro.props;
+const matchingId = `matching-${Math.random().toString(36).slice(2, 9)}`;
+const pairCount = level === 'CP' ? 4 : level === 'CE1' ? 5 : 6;
+---
+
+<div class="matching-game" id={matchingId}>
+  <div class="matching-header">
+    <h2 class="matching-title">🔗 {title}</h2>
+    <span class="matching-score">✅ <strong>0</strong> / {pairCount} reliés</span>
+  </div>
+  
+  <p class="matching-instruction">Clique sur un élément à gauche, puis sur son correspondant à droite.</p>
+  
+  <div class="matching-container">
+    <div class="matching-column matching-left">
+      <span class="column-label">Questions</span>
+      <div class="matching-items"></div>
+    </div>
+    
+    <div class="matching-lines">
+      <svg class="lines-svg"></svg>
+    </div>
+    
+    <div class="matching-column matching-right">
+      <span class="column-label">Réponses</span>
+      <div class="matching-items"></div>
+    </div>
+  </div>
+  
+  <div class="matching-win" hidden>
+    <span class="win-emoji">🎉</span>
+    <p class="win-text">Bravo, tout est relié !</p>
+    <button type="button" class="btn btn--primary btn--lg replay-btn">🔄 Rejouer</button>
+  </div>
+</div>
+
+<script define:vars={{ items, matchingId, pairCount }}>
+  const container = document.getElementById(matchingId);
+  if (!container) throw new Error('Matching container not found');
+
+  let selected = null;
+  let matchedCount = 0;
+  let pairs = [];
+
+  const leftCol = container.querySelector('.matching-left .matching-items');
+  const rightCol = container.querySelector('.matching-right .matching-items');
+  const scoreDisplay = container.querySelector('.matching-score strong');
+  const winEl = container.querySelector('.matching-win');
+  const linesSvg = container.querySelector('.lines-svg');
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function initGame() {
+    matchedCount = 0;
+    selected = null;
+    pairs = [];
+    scoreDisplay.textContent = '0';
+    winEl.hidden = true;
+    linesSvg.innerHTML = '';
+    
+    const selectedItems = shuffle(items).slice(0, pairCount);
+    
+    const leftItems = selectedItems.map((item, idx) => ({
+      id: `left-${idx}`,
+      pairId: idx,
+      content: item.q
+    }));
+    
+    const rightItems = shuffle(selectedItems.map((item, idx) => ({
+      id: `right-${idx}`,
+      pairId: idx,
+      content: item.a
+    })));
+    
+    leftCol.innerHTML = leftItems.map(item => `
+      <button class="match-item" data-id="${item.id}" data-pair="${item.pairId}" data-side="left">
+        ${item.content}
+      </button>
+    `).join('');
+    
+    rightCol.innerHTML = rightItems.map(item => `
+      <button class="match-item" data-id="${item.id}" data-pair="${item.pairId}" data-side="right">
+        ${item.content}
+      </button>
+    `).join('');
+    
+    container.querySelectorAll('.match-item').forEach(item => {
+      item.addEventListener('click', () => handleClick(item));
+    });
+  }
+
+  function handleClick(item) {
+    if (item.classList.contains('matched')) return;
+    
+    const side = item.dataset.side;
+    
+    if (!selected) {
+      selected = item;
+      item.classList.add('selected');
+    } else if (selected === item) {
+      selected.classList.remove('selected');
+      selected = null;
+    } else if (selected.dataset.side === side) {
+      selected.classList.remove('selected');
+      selected = item;
+      item.classList.add('selected');
+    } else {
+      // Vérifier la correspondance
+      const pair1 = selected.dataset.pair;
+      const pair2 = item.dataset.pair;
+      
+      if (pair1 === pair2) {
+        // Match !
+        selected.classList.remove('selected');
+        selected.classList.add('matched');
+        item.classList.add('matched');
+        
+        pairs.push({ left: selected, right: item });
+        drawLine(selected, item);
+        
+        matchedCount++;
+        scoreDisplay.textContent = String(matchedCount);
+        
+        if (matchedCount === pairCount) {
+          setTimeout(() => { winEl.hidden = false; }, 500);
+        }
+      } else {
+        // Pas de match
+        selected.classList.add('wrong');
+        item.classList.add('wrong');
+        
+        setTimeout(() => {
+          selected.classList.remove('selected', 'wrong');
+          item.classList.remove('wrong');
+          selected = null;
+        }, 500);
+        return;
+      }
+      
+      selected = null;
+    }
+  }
+
+  function drawLine(el1, el2) {
+    const containerRect = container.querySelector('.matching-container').getBoundingClientRect();
+    const rect1 = el1.getBoundingClientRect();
+    const rect2 = el2.getBoundingClientRect();
+    
+    const x1 = rect1.right - containerRect.left;
+    const y1 = rect1.top + rect1.height / 2 - containerRect.top;
+    const x2 = rect2.left - containerRect.left;
+    const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+    
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1);
+    line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2);
+    line.setAttribute('y2', y2);
+    line.setAttribute('stroke', '#22c55e');
+    line.setAttribute('stroke-width', '3');
+    line.setAttribute('stroke-linecap', 'round');
+    
+    linesSvg.appendChild(line);
+  }
+
+  container.querySelector('.replay-btn')?.addEventListener('click', initGame);
+  
+  initGame();
+</script>
+
+<style>
+  .matching-game {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .matching-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .matching-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  
+  .matching-score {
+    font-size: 0.95rem;
+  }
+  
+  .matching-score strong {
+    color: var(--color-success);
+  }
+  
+  .matching-instruction {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+  }
+  
+  .matching-container {
+    display: flex;
+    gap: 1rem;
+    position: relative;
+  }
+  
+  .matching-column {
+    flex: 1;
+  }
+  
+  .column-label {
+    display: block;
+    text-align: center;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  
+  .matching-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .match-item {
+    padding: 1rem 1.25rem;
+    background: #f8fafc;
+    border: 3px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  
+  .match-item:hover:not(.matched) {
+    border-color: var(--color-primary);
+    background: white;
+  }
+  
+  .match-item.selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+  }
+  
+  .match-item.matched {
+    border-color: var(--color-success);
+    background: #dcfce7;
+    color: var(--color-success);
+    cursor: default;
+  }
+  
+  .match-item.wrong {
+    border-color: var(--color-error);
+    background: #fee2e2;
+    animation: shake 0.3s ease;
+  }
+  
+  .matching-lines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  
+  .lines-svg {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .matching-win {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, #fef3c7, #d9f99d);
+    border-radius: var(--radius-lg);
+  }
+  
+  .matching-win .win-emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .matching-win .win-text {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--color-success);
+    margin: 0 0 1.5rem;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  
+  @media (max-width: 600px) {
+    .matching-container {
+      flex-direction: column;
+    }
+    
+    .matching-lines {
+      display: none;
+    }
+  }
+</style>
